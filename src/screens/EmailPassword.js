@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import * as validator from 'email-validator';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 
 function EmailPassword () {
@@ -10,35 +10,48 @@ function EmailPassword () {
     const [password, setPassword] = useState('');
     const [verifyPassword, setVerifyPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { firstName, lastName, username } = route.params; // pulls data passed from NameScreen
 
     //saves the users email, password, and the verification password
-    const handleRestistration = () => {
-        console.log('email:', email);
-        console.log('password:', password);
-        console.log('password:', verifyPassword);
-        validateLogin(); 
-    }
+    const handleRegistration = () => {
+        const isValid = validateForm();
+        if (!isValid) return;
 
-    const validateLogin = () => {
-        setEmail(email);
-        setPassword(password);
-        setVerifyPassword(verifyPassword);
+        // navigates to DietaryRestrictionsScreen passing all collected data
+        navigation.navigate('DietaryRestrictionsScreen', {
+            firstName,
+            lastName,
+            username,
+            email,
+            password,
+        });
+    };
+
+    const validateForm = () => {
         //checks if the user responded to every prompt
         if (email.length === 0 || password.length === 0 ) {
-            setErrorMessage('please enter a response into every box')
+            setErrorMessage('please enter a response into every box');
+            return false; // stops if fields are empty
         }
         //checks if the email is valid
-        if (validator.validate(email)) {
-            setErrorMessage('');
-        } else { return setErrorMessage('please enter a valid email address.');}
-   
+        if (!validator.validate(email)) {
+            setErrorMessage('please enter a valid email address.');
+            return false;
+        }
         //checks the password to meet the requirements
         if (password.length < 6 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\W/.test(password)) {
-                return setErrorMessage('password have: \n at least 6 characters \n at least one capital letter \n at least one lowercase letter \n at least one special character'); 
-            } else {setErrorMessage('')}
-        
+                setErrorMessage('password must have: \n at least 6 characters \n at least one capital letter \n at least one lowercase letter \n at least one special character');
+                return false;
+        }
         //checks if the password matches the verification password
-        if (password === verifyPassword) {} else {return setErrorMessage('passwords must match')};
+        if (password !== verifyPassword) {
+            setErrorMessage('password must match');
+            return false;
+        }
+        setErrorMessage('');
+        return true;
     }
 
     return (
@@ -70,8 +83,8 @@ function EmailPassword () {
                 autoCapitalize='none'
                 secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleRestistration}>
-                    <Text style={styles.buttonText}>Register</Text>
+                <TouchableOpacity style={styles.button} onPress={handleRegistration}>
+                    <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
                 {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text>: null}
             </SafeAreaView>
@@ -85,7 +98,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'pink',
-        justifyContent:'center'
     },
     label: {
         fontSize: 16,

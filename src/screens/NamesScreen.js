@@ -20,7 +20,7 @@ function NamesScreen () {
         console.log('username', username);
         
         //moves to the next screen
-        navigation.navigate('EmailPassword');      
+        navigation.navigate('EmailPassword', {firstName, lastName, username});
     }
 
 /* checks if the username is taken, should work after
@@ -31,7 +31,7 @@ we connect the frontend and backend but i can't test it until we connect
 
     const checkUsernameAvailability = async (inputUsername) => {
         try {
-            const response = await fetch('backend URL {inputUsername}');
+            const response = await fetch('http://127.0.0.1:5000/auth/check-username/${inputUsername}');
             const data = await response.json();
 
             setIsTaken(data.isTaken);
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'pink',
-        justifyContent:'center'
     },
     label: {
         fontSize: 16,

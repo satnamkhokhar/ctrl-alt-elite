@@ -2,21 +2,25 @@ import React, {useState} from 'react';
 import {Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
 
 function LoginScreen () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
-    const [message, setMessage] = useState('');
-    const [isTaken, setIsTaken] = useState(false);
-    
-/* checks if the login info exist in our database, should work after
-we connect the frontend and backend but i can't test it until we connect
+    const BASE_URL = `http://${Constants.expoConfig.hostUri.split(':')[0]}:5000`;
 
-    const loginUser = async (email, password) => {
+    const handleLogin = async () => {
+        if (email.length === 0 || password.length === 0) {
+            setErrorMessage('Please enter your email and password');
+            return;
+        }
+
         try {
-            const response = await fetch('backend URL', {
+            const response = await fetch(`${BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,29 +28,24 @@ we connect the frontend and backend but i can't test it until we connect
             body: JSON.stringify({
                 email: email,
                 password: password,
-            })
+            }),
         });
 
         const data = await response.json();
 
         if (response.ok) {
             console.log('login successful token:', data.access_token);
-            return data;
+            await AsyncStorage.setItem('access_token', data.access_token);
+            setErrorMessage(''); //clears any previous error messages
+            navigation.navigate('HomeScreen'); //navigates to home screen on success
         } else {
-            console.error('Login failed:', data.error);
-            return null;
+            setErrorMessage(data.error || 'login failed');
         }
     } catch (error) {
         console.error('network error:', error);
-        return null;
+        setErrorMessage('could not connect to the server');
     }
     };
-*/
-    //saves the login info
-    const handleLogin = () => {
-        console.log('email:', email);
-        console.log('password:', password);
-    }
 
     return (
         <SafeAreaProvider>
@@ -78,6 +77,8 @@ we connect the frontend and backend but i can't test it until we connect
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NamesScreen')}>
                     <Text style={styles.buttonText}>Create Account</Text>
                 </TouchableOpacity>
+
+                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -89,7 +90,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'pink',
-        justifyContent:'center'
     },
     label: {
         fontSize: 16,
@@ -122,6 +122,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight:'bold',
         textAlign:'center',
+    },
+    errorText: {
+        color:'red',
     }
 });
 
