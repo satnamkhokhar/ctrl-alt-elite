@@ -3,7 +3,7 @@ import {Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
+import { loginUser } from '../services/api'; // imports the loginUser function from the service layer
 
 
 function LoginScreen () {
@@ -11,7 +11,6 @@ function LoginScreen () {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
-    const BASE_URL = `http://${Constants.expoConfig.hostUri.split(':')[0]}:5000`;
 
     const handleLogin = async () => {
         if (email.length === 0 || password.length === 0) {
@@ -19,32 +18,15 @@ function LoginScreen () {
             return;
         }
 
-        try {
-            const response = await fetch(`${BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-        });
+        const result = await loginUser(email, password); // calls the service function instead of fetch directly
 
-        const data = await response.json();
-
-        if (response.ok) {
-            console.log('login successful token:', data.access_token);
-            await AsyncStorage.setItem('access_token', data.access_token);
-            setErrorMessage(''); //clears any previous error messages
-            navigation.navigate('HomeScreen'); //navigates to home screen on success
+        if (result.success) {
+            await AsyncStorage.setItem('access_token', result.token); // saves the JWT token to the device
+            setErrorMessage('');
+            navigation.navigate('HomeScreen'); // navigates to home screen on success
         } else {
-            setErrorMessage(data.error || 'login failed');
+            setErrorMessage(result.error); // shows the error message returned from the service
         }
-    } catch (error) {
-        console.error('network error:', error);
-        setErrorMessage('could not connect to the server');
-    }
     };
 
     return (
