@@ -53,11 +53,11 @@ def create_session():
 @sessions_bp.route('/<int:session_id>', methods=['GET'])
 @jwt_required()
 def get_session(session_id):
-    session = Session.query.get(session_id) # looks up session id by primary key
+    session = db.session.get(Session, session_id) # looks up session id by primary key
     
     if not session:
-        return jsonify({'error: session not found.'}), 404
-    
+        return jsonify({'error': 'session not found.'}), 404
+
     members = SessionUser.query.filter_by(session_id=session_id).all()
     user_ids = [m.user_id for m in members]
     
@@ -75,9 +75,9 @@ def get_session(session_id):
 def join_session(session_id):
     current_user_id = get_jwt_identity()
     
-    session = Session.query.get(session_id)
+    session = db.session.get(Session, session_id)
     if not session:
-        return jsonify({'error: session not found.'}), 404
+        return jsonify({'error': 'session not found.'}), 404
     
     already_joined = SessionUser.query.filter_by(
         session_id=session_id,
