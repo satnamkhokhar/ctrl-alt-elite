@@ -20,6 +20,8 @@ def create_app():
     #Register blueprints - each blueprint is a group of related routes
     from .routes.auth import auth_bp
     #from .routes.groups import groups_bp
+    #from .routes.restaurants import restaurants_bp
+    from .routes.sessions import sessions_bp
     from .routes.restaurants import restaurants_bp
     #from .routes.sessions import sessions_bp
     #from .routes.votes import votes_bp
@@ -28,7 +30,7 @@ def create_app():
     app.register_blueprint(restaurants_bp, url_prefix='/restaurants')
     #app.register_blueprint(groups_bp, url_prefix='/groups')
     #app.register_blueprint(restaurants_bp, url_prefix='/restaurants')
-    #app.register_blueprint(sessions_bp, url_prefix='/sessions')
+    app.register_blueprint(sessions_bp, url_prefix='/sessions')
     #app.register_blueprint(votes_bp, url_prefix='/votes')
 
     return app
