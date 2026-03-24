@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..models.user import db
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from ..models.session import Session, SessionUser
+from ..models.user import db
 
 sessions_bp = Blueprint('sessions', __name__)
 
@@ -26,7 +27,7 @@ def create_session():
     new_session = Session( #Creates a new session object
         budget=budget,
         max_distance=max_distance,
-        active_user=1
+        active_users=1
     )
 
     db.session.add(new_session) #stages the new session to be saved
@@ -49,14 +50,53 @@ def create_session():
         'active_users': new_session.active_users
     }), 201
 
-
-
 @sessions_bp.route('/<int:session_id>', methods=['GET'])
 @jwt_required()
 def get_session(session_id):
-    pass
+    session = Session.query.get(session_id) # looks up session id by primary key
+    
+    if not session:
+        return jsonify({'error: session not found.'}), 404
+    
+    members = SessionUser.query.filter_by(session_id=session_id).all()
+    user_ids = [m.user_id for m in members]
+    
+    return jsonify({
+        'session_id': session.session_id,
+        'budget': float(session.budget),
+        'max_distance': float(session.max_distance),
+        'active_users': session.active_users,
+        'members': user_ids,
+        'created_at': session.created_at.isoformat()
+    }), 200
 
 @sessions_bp.route('/<int:session_id>/join', methods=['POST'])
 @jwt_required()
 def join_session(session_id):
-    pass
+    current_user_id = get_jwt_identity()
+    
+    session = Session.query.get(session_id)
+    if not session:
+        return jsonify({'error: session not found.'}), 404
+    
+    already_joined = SessionUser.query.filter_by(
+        session_id=session_id,
+        user_id=current_user_id
+    ).first()
+    
+    if already_joined:
+        return jsonify({'error: User has already joined.'})
+    
+    new_member = SessionUser(
+        session_id=session_id,
+        user_id=current_user_id
+    )
+    db.session.add(new_member)
+    
+    session.active_users += 1
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'successfully joined the session',
+        'session_id': session_id
+    }), 200
