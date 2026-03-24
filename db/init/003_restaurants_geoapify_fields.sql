@@ -1,0 +1,14 @@
+ALTER TABLE restaurants
+ADD COLUMN IF NOT EXISTS external_place_id TEXT UNIQUE;
+
+ALTER TABLE restaurants
+ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;
+
+ALTER TABLE restaurants
+ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;
+
+ALTER TABLE restaurants
+ADD COLUMN IF NOT EXISTS formatted_address TEXT;
+
+ALTER TABLE restaurants
+ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'geoapify';

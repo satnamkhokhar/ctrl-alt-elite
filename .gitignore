@@ -42,3 +42,8 @@ app-example
 /ios
 /android
 .DS_Store
+backend/.env
+# Python
+backend/venv/
+**/__pycache__/
+*.pyc
