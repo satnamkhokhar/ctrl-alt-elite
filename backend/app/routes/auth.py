@@ -14,7 +14,8 @@ def register():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-
+    dietary_restrictions = data.get('dietary_restrictions')  # NEW: comma-separated string
+    
     #checks that every field was actually sent
     if not all([first_name, last_name, username, email, password]):
         return jsonify({'error': 'all fields are required'}), 400 # 400 means a bad request
@@ -37,6 +38,7 @@ def register():
         username=username,
         email=email,
         password_hash=password_hash.decode('utf-8') #decode converts the bytes back to a string
+        dietary_restrictions=dietary_restrictions
     )
 
     db.session.add(new_user) #stages the new user to be saved
