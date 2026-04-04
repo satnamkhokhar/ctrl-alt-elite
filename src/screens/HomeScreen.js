@@ -1,8 +1,10 @@
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-
+// added temporary values for swipe screen navigation (line 21) - like longitute, latitude, and more for swipe card screen so that based on that restaurants are shown (will be chnaged when real user sessions form)
 function HomeScreen () {
+    const navigation = useNavigation();
 
     return (
         <SafeAreaProvider>    
@@ -14,12 +16,12 @@ function HomeScreen () {
             > 
             <SafeAreaView style={styles.container}>
                 <Text style={styles.DineSync}>{'\n'}DineSync</Text>
-                <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text>
+                <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text> 
                 
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SwipeCardScreen', { sessionId: 1, userId: 1, latitude: 33.7490, longitude: -84.3880, radius: 3000, dietary: 'vegan',})}> 
                         <Text style={styles.buttonText}>Start Swiping</Text>
-                </TouchableOpacity>
-
+                </TouchableOpacity> 
+            
                 <TouchableOpacity style={styles.logoButton}>
                        <Image
                             source={require('../../assets/dollar-sign.png')}
