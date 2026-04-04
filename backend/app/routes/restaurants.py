@@ -3,6 +3,7 @@ import requests
 import psycopg2
 from flask import Blueprint, request, jsonify
 from dotenv import load_dotenv
+from app.utils.helpers import calculate_distance
 
 load_dotenv()
 
@@ -64,6 +65,8 @@ def search_restaurants():
         cuisine = ", ".join(props.get("categories", [])[:3]) if props.get("categories") else None
         lat = props.get("lat")
         lon = props.get("lon")
+        distance = calculate_distance(latitude, longitude, lat, lon)
+        phone = props.get("contact", {}).get("phone")
 
         cur.execute(
             """
@@ -93,7 +96,9 @@ def search_restaurants():
             "formatted_address": row[3],
             "cuisine": row[4],
             "latitude": row[5],
-            "longitude": row[6]
+            "longitude": row[6],
+            "distance": distance,
+            "phone": phone
         })
 
     conn.commit()
