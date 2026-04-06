@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { castVote, fetchRestaurants } from '../services/api';
-import SwipeCard from './SwipeCard';
+import SwipeCard from '../components/SwipeCard';
 
 function SwipeCardScreen({ route, navigation }) {
     const swiperRef = useRef(null);
@@ -66,39 +67,46 @@ function SwipeCardScreen({ route, navigation }) {
         navigation.navigate('WaitingScreen', { sessionId });
     };
 
-    if (loading) {
-        return (
-            <SafeAreaProvider>
+    const gradientWrapper = (children) => (
+        <SafeAreaProvider>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
                 <SafeAreaView style={styles.container}>
-                    <ActivityIndicator size="large" color="black" />
-                    <Text style={styles.message}>Loading restaurants...</Text>
+                    {children}
                 </SafeAreaView>
-            </SafeAreaProvider>
+            </LinearGradient>
+        </SafeAreaProvider>
+    );
+
+    if (loading) {
+        return gradientWrapper(
+            <>
+                <ActivityIndicator size="large" color="white" />
+                <Text style={styles.message}>Loading restaurants...</Text>
+            </>
         );
     }
 
     if (errorMessage) {
-        return (
-            <SafeAreaProvider>
-                <SafeAreaView style={styles.container}>
-                    <Text style={styles.message}>{errorMessage}</Text>
-                </SafeAreaView>
-            </SafeAreaProvider>
-        );
+        return gradientWrapper(<Text style={styles.message}>{errorMessage}</Text>);
     }
 
     if (restaurants.length === 0) {
-        return (
-            <SafeAreaProvider>
-                <SafeAreaView style={styles.container}>
-                    <Text style={styles.message}>No restaurants available</Text>
-                </SafeAreaView>
-            </SafeAreaProvider>
-        );
+        return gradientWrapper(<Text style={styles.message}>No restaurants available</Text>);
     }
 
     return (
         <SafeAreaProvider>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
             <SafeAreaView style={styles.container}>
                 <Text style={styles.title}>Swipe Restaurants</Text>
 
@@ -114,8 +122,7 @@ function SwipeCardScreen({ route, navigation }) {
                         onSwipedRight={handleSwipeRight}
                         onSwipedAll={handleSwipedAll}
                         backgroundColor="transparent"
-                        cardsHorizontalMargin={20}
-                        cardsVerticalMargin={80}
+                        cardVerticalMargin={10}
                         stackSize={3}
                         stackSeparation={15}
                         animateOverlayLabelsOpacity
@@ -157,6 +164,7 @@ function SwipeCardScreen({ route, navigation }) {
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
+            </LinearGradient>
         </SafeAreaProvider>
     );
 }
@@ -164,39 +172,38 @@ function SwipeCardScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'pink',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        justifyContent: 'center',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginTop: 20,
-        marginBottom: 20,
+        color: 'white',
+        marginTop: 10,
+        marginBottom: 5,
         textAlign: 'center',
+        alignSelf: 'center',
     },
     swiperContainer: {
-        flex: 1,
+        height: Dimensions.get('window').height * 0.72,
         width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     buttonRow: {
+        position: 'absolute',
+        bottom: 40,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '90%',
-        marginBottom: 24,
-        marginTop: 8,
+        justifyContent: 'space-evenly',
+        zIndex: 10,
     },
     actionButton: {
-        width: 120,
-        height: 48,
-        borderRadius: 10,
+        width: 130,
+        height: 50,
+        borderRadius: 8,
         borderWidth: 2,
-        borderColor: 'black',
+        borderColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
+        opacity: .85,
     },
     noButton: {
         backgroundColor: '#ff8fa3',
@@ -205,9 +212,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'mediumspringgreen',
     },
     actionButtonText: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#f00b0bff',
     },
     leftLabel: {
         backgroundColor: 'red',
@@ -246,6 +253,7 @@ const styles = StyleSheet.create({
     message: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: 'white',
         textAlign: 'center',
     },
 });

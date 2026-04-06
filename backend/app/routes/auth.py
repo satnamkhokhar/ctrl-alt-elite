@@ -37,7 +37,7 @@ def register():
         last_name=last_name,
         username=username,
         email=email,
-        password_hash=password_hash.decode('utf-8') #decode converts the bytes back to a string
+        password_hash=password_hash.decode('utf-8'), #decode converts the bytes back to a string
         dietary_restrictions=dietary_restrictions
     )
 
@@ -65,5 +65,5 @@ def login():
     #Creates a JWT token using the user's id as their identity
     access_token = create_access_token(identity=str(user.user_id))
 
-    return jsonify({'access_token': access_token}), 200 # 200 means success, sends token to frontend
+    return jsonify({'access_token': access_token, 'user_id': user.user_id}), 200 # 200 means success, sends token to frontend
 

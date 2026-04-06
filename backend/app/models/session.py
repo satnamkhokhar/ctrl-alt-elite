@@ -8,6 +8,11 @@ class Session(db.Model):
     max_distance = db.Column(db.Numeric(10, 2), nullable=True)
     dietary_restrictions = db.Column(db.Text, nullable=True)
     active_users = db.Column(db.Integer, default=0)
+
+    # New fields:
+    matched_restaurant_id = db.Column(db.BigInteger, db.ForeignKey('restaurants.restaurant_id'), nullable=True)
+    status = db.Column(db.String(20), default='active') # active, matched, expired
+
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
 class SessionUser(db.Model):

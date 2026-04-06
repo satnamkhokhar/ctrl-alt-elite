@@ -21,7 +21,7 @@ function NamesScreen () {
         console.log('username', username);
         
         //moves to the next screen
-        navigation.navigate('EmailPassword');      
+        navigation.navigate('EmailPassword', { firstName, lastName, username });
     }
 
 /* checks if the username is taken, should work after
@@ -128,21 +128,21 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        borderColor:'white',
+        borderColor: 'white',
         borderWidth: 2,
-        height: 30,
-        width: 75,
+        height: 50,
+        width: 300,
         borderRadius: 8,
-        marginBottom: 8,
-        marginTop: 8,
+        marginTop: 15,
         justifyContent: 'center',
-        color: 'white',
+        backgroundColor: 'white',
+        opacity: .45,
     },
     buttonText: {
-        color:'white',
-        fontSize: 16,
-        fontWeight:'bold',
-        textAlign:'center',
+        color: '#f00b0bff',
+        fontSize: 25,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

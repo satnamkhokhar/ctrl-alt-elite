@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from ..models.session import Session, SessionUser
-from ..models.user import db
+from ..models.user import db, User
 
 sessions_bp = Blueprint('sessions', __name__)
 
@@ -67,8 +67,35 @@ def get_session(session_id):
         'max_distance': float(session.max_distance),
         'active_users': session.active_users,
         'members': user_ids,
+        'status': session.status,
         'created_at': session.created_at.isoformat()
     }), 200
+
+@sessions_bp.route('/<int:session_id>/start', methods=['POST'])
+@jwt_required()
+def start_session(session_id):
+    session = db.session.get(Session, session_id)
+    if not session:
+        return jsonify({'error': 'session not found'}), 404
+
+    session.status = 'started'
+    db.session.commit()
+
+    # Return aggregated dietary restrictions from all members
+    members = SessionUser.query.filter_by(session_id=session_id).all()
+    all_restrictions = []
+    for member in members:
+        user = db.session.get(User, member.user_id)
+        if user and user.dietary_restrictions:
+            all_restrictions.extend(user.dietary_restrictions.lower().split(','))
+
+    dietary = None
+    if 'vegan' in all_restrictions:
+        dietary = 'vegan'
+    elif 'vegetarian' in all_restrictions:
+        dietary = 'vegetarian'
+
+    return jsonify({'message': 'session started', 'dietary': dietary}), 200
 
 @sessions_bp.route('/<int:session_id>/join', methods=['POST'])
 @jwt_required()

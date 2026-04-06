@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import CheckBox from '@react-native-community/checkbox';
+import { LinearGradient } from 'expo-linear-gradient';
+import Checkbox from 'expo-checkbox';
+import { registerUser } from '../services/api';
 
 function DietaryRestrictionsScreen({ navigation, route }) {
     const { firstName, lastName, username, email, password } = route.params;
@@ -28,53 +30,50 @@ function DietaryRestrictionsScreen({ navigation, route }) {
             .filter((key) => restrictions[key])
             .join(",");
 
-        try {
-            const response = await fetch('http://YOUR_IP:5000/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    first_name: firstName,
-                    last_name: lastName,
-                    username,
-                    email,
-                    password,
-                    dietary_restrictions: selected,
-                }),
-            });
+        const result = await registerUser({
+            first_name: firstName,
+            last_name: lastName,
+            username,
+            email,
+            password,
+            dietary_restrictions: selected,
+        });
 
-            const data = await response.json();
-
-            if (response.status === 201) {
-                navigation.navigate('LoginScreen');
-            } else {
-                setErrorMessage(data.message || 'Registration failed');
-            }
-        } catch {
-            setErrorMessage('Network error');
+        if (result.success) {
+            navigation.navigate('HomeScreen');
+        } else {
+            setErrorMessage(result.error || 'Registration failed');
         }
     };
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.title}>Select Dietary Restrictions</Text>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <SafeAreaView style={styles.container}>
+                    <Text style={styles.title}>Select Dietary Restrictions</Text>
 
-                {Object.keys(restrictions).map((key) => (
-                    <View key={key} style={styles.row}>
-                        <CheckBox
-                            value={restrictions[key]}
-                            onValueChange={() => toggleCheckbox(key)}
-                        />
-                        <Text>{key}</Text>
-                    </View>
-                ))}
+                    {Object.keys(restrictions).map((key) => (
+                        <View key={key} style={styles.row}>
+                            <Checkbox
+                                value={restrictions[key]}
+                                onValueChange={() => toggleCheckbox(key)}
+                            />
+                            <Text style={styles.rowText}>{key}</Text>
+                        </View>
+                    ))}
 
-                {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+                    {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text>Finish Registration</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
+                    <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                        <Text style={styles.buttonText}>Finish Registration</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
+            </LinearGradient>
         </SafeAreaProvider>
     );
 }
@@ -86,15 +85,22 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'pink',
     },
-    title: { fontSize: 20, marginBottom: 20 },
-    row: { flexDirection: 'row', marginBottom: 10 },
+    title: { fontSize: 20, fontWeight: 'bold', color: 'white', marginBottom: 20 },
+    row: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+    rowText: { fontSize: 16, color: 'white', fontWeight: 'bold' },
     button: {
-        marginTop: 20,
-        backgroundColor: 'mediumspringgreen',
+        alignItems: 'center',
+        borderColor: 'white',
         borderWidth: 2,
-        padding: 10,
+        height: 50,
+        width: 300,
+        borderRadius: 8,
+        marginTop: 15,
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        opacity: .45,
     },
-    error: { color: 'red', marginTop: 10 },
+    buttonText: { fontSize: 25, fontWeight: 'bold', color: '#f00b0bff', textAlign: 'center' },
+    error: { color: 'white', fontWeight: 'bold', marginTop: 10 },
 });
