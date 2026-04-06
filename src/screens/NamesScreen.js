@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
-import {Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
-import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 function NamesScreen () {
     const [firstName, setFirstName] = useState('');
@@ -20,7 +21,7 @@ function NamesScreen () {
         console.log('username', username);
         
         //moves to the next screen
-        navigation.navigate('EmailPassword', {firstName, lastName, username});
+        navigation.navigate('EmailPassword');      
     }
 
 /* checks if the username is taken, should work after
@@ -31,7 +32,7 @@ we connect the frontend and backend but i can't test it until we connect
 
     const checkUsernameAvailability = async (inputUsername) => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/auth/check-username/${inputUsername}');
+            const response = await fetch('backend URL {inputUsername}');
             const data = await response.json();
 
             setIsTaken(data.isTaken);
@@ -51,6 +52,12 @@ we connect the frontend and backend but i can't test it until we connect
 */
     return (
         <SafeAreaProvider>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
             <SafeAreaView style={styles.container}>
                 <Text style={styles.label}>First Name:</Text>
                 <TextInput
@@ -80,11 +87,12 @@ we connect the frontend and backend but i can't test it until we connect
                 />
                 <Text style={styles.font}>Enter your information into all of the boxes to proceed</Text>
                 {isNameEntered && (
-                <TouchableOpacity style={styles.button} onPress={() => handleNames()}>
+                <TouchableOpacity style={styles.button} onPress={() => handleNames()} testID="Next">
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
                 )}
             </SafeAreaView>
+        </LinearGradient>
         </SafeAreaProvider>
     );
 }
@@ -94,31 +102,33 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'pink',
+        justifyContent:'center'
     },
     label: {
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
+        color: 'white',
     },
     font: {
         fontSize: 9,
-        textAlign: 'center'
+        textAlign: 'center',
+        color: 'white',
     },
     input: {
         borderWidth: 1,
-        borderColor: 'black',
+        borderColor: 'white',
         height: 30,
         width: 175,
         fontSize: 16,
         marginBottom: 16,
         borderRadius: 8,
-        textAlign: 'center'
+        textAlign: 'center',
+        color: 'white',
     },
     button: {
         alignItems: 'center',
-        backgroundColor: 'mediumspringgreen',
-        borderColor:'black',
+        borderColor:'white',
         borderWidth: 2,
         height: 30,
         width: 75,
@@ -126,9 +136,10 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         marginTop: 8,
         justifyContent: 'center',
+        color: 'white',
     },
     buttonText: {
-        color:'black',
+        color:'white',
         fontSize: 16,
         fontWeight:'bold',
         textAlign:'center',
