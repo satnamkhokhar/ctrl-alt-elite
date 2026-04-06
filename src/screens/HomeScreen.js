@@ -31,7 +31,7 @@ function HomeScreen() {
                 >
                     <Text style={styles.buttonText}>Join Session</Text>
                 </TouchableOpacity>
-                {/*
+            
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
                         source={require('../../assets/dollar-sign.png')}
@@ -85,7 +85,7 @@ function HomeScreen() {
                         style={styles.group}
                     />
                 </TouchableOpacity>
-            */}
+            
             </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
