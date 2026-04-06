@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-// added temporary values for swipe screen navigation (line 21) - like longitute, latitude, and more for swipe card screen so that based on that restaurants are shown (will be chnaged when real user sessions form)
-function HomeScreen () {
+
+function HomeScreen() {
     const navigation = useNavigation();
 
     return (
@@ -18,15 +18,18 @@ function HomeScreen () {
                 <Text style={styles.DineSync}>{'\n'}DineSync</Text>
                 <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text> 
                 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SwipeCardScreen', { sessionId: 1, userId: 1, latitude: 33.7490, longitude: -84.3880, radius: 3000, dietary: 'vegan',})}> 
-                        <Text style={styles.buttonText}>Start Swiping</Text>
+                <TouchableOpacity 
+                    style={styles.button} 
+                    onPress={() => navigation.navigate('SessionScreen')}
+                > 
+                    <Text style={styles.buttonText}>Start Session</Text>
                 </TouchableOpacity> 
             
                 <TouchableOpacity style={styles.logoButton}>
-                       <Image
-                            source={require('../../assets/dollar-sign.png')}
-                            style={styles.dollarSign}
-                        />
+                    <Image
+                        source={require('../../assets/dollar-sign.png')}
+                        style={styles.dollarSign}
+                    />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
@@ -36,43 +39,43 @@ function HomeScreen () {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/map.png')}
-                    style={styles.map}
+                        source={require('../../assets/map.png')}
+                        style={styles.map}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/share.png')}
-                    style={styles.share}
+                        source={require('../../assets/share.png')}
+                        style={styles.share}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/profile.png')}
-                    style={styles.profile}
+                        source={require('../../assets/profile.png')}
+                        style={styles.profile}
                     />
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/star.png')}
-                    style={styles.star}
+                        source={require('../../assets/star.png')}
+                        style={styles.star}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/search.png')}
-                    style={styles.search}
+                        source={require('../../assets/search.png')}
+                        style={styles.search}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/group.png')}
-                    style={styles.group}
+                        source={require('../../assets/group.png')}
+                        style={styles.group}
                     />
                 </TouchableOpacity>
 
@@ -184,4 +187,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeScreen
+export default HomeScreen;
