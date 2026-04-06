@@ -100,3 +100,36 @@ def join_session(session_id):
         'message': 'successfully joined the session',
         'session_id': session_id
     }), 200
+
+@sessions_bp.route('/create-with-group', methods=['POST'])
+@jwt_required()
+def create_session_with_group():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+
+    group_id = data.get("group_id")
+
+    if not group_id:
+        return jsonify({"error": "group_id required"}), 400
+
+    members = SavedGroupMember.query.filter_by(group_id=group_id).all()
+
+    if not members:
+        return jsonify({"error": "Group has no members"}), 400
+
+    new_session = Session(created_by=user_id)
+    db.session.add(new_session)
+    db.session.commit()
+
+    for m in members:
+        db.session.add(SessionUser(
+            session_id=new_session.session_id,
+            user_id=m.user_id
+        ))
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Session created from group",
+        "session_id": new_session.session_id
+    }), 201
