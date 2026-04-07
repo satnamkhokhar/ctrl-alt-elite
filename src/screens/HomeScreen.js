@@ -18,12 +18,19 @@ function HomeScreen() {
                 <Text style={styles.DineSync}>{'\n'}DineSync</Text>
                 <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text> 
                 
-                <TouchableOpacity 
-                    style={styles.button} 
+                <TouchableOpacity
+                    style={styles.button}
                     onPress={() => navigation.navigate('SessionScreen')}
-                > 
+                >
                     <Text style={styles.buttonText}>Start Session</Text>
-                </TouchableOpacity> 
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('JoinSessionScreen')}
+                >
+                    <Text style={styles.buttonText}>Join Session</Text>
+                </TouchableOpacity>
             
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
@@ -78,7 +85,7 @@ function HomeScreen() {
                         style={styles.group}
                     />
                 </TouchableOpacity>
-
+            
             </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>

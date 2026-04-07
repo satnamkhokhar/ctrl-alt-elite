@@ -62,17 +62,29 @@ def search_restaurants():
         name = props.get("name")
         formatted_address = props.get("formatted")
         location = props.get("formatted")
-        cuisine = ", ".join(props.get("categories", [])[:3]) if props.get("categories") else None
+        # Extract a readable cuisine label from Geoapify's dot-separated category tags
+        # e.g. "catering.restaurant.italian" -> "Italian"
+        categories = props.get("categories", [])
+        cuisine = None
+        for cat in reversed(categories):
+            parts = cat.split('.')
+            if len(parts) >= 3 and parts[0] == 'catering':
+                label = parts[-1].replace('_', ' ').title()
+                cuisine = label
+                break
+        if not cuisine:
+            cuisine = 'Restaurant'
         lat = props.get("lat")
         lon = props.get("lon")
         distance = calculate_distance(latitude, longitude, lat, lon)
         phone = props.get("contact", {}).get("phone")
+        website = props.get("contact", {}).get("website")
 
         cur.execute(
             """
             INSERT INTO restaurants
-            (external_place_id, name, location, formatted_address, cuisine, latitude, longitude, source)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'geoapify')
+            (external_place_id, name, location, formatted_address, cuisine, latitude, longitude, source, website)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'geoapify', %s)
             ON CONFLICT (external_place_id)
             DO UPDATE SET
                 name = EXCLUDED.name,
@@ -81,10 +93,11 @@ def search_restaurants():
                 cuisine = EXCLUDED.cuisine,
                 latitude = EXCLUDED.latitude,
                 longitude = EXCLUDED.longitude,
-                source = EXCLUDED.source
-            RETURNING restaurant_id, external_place_id, name, formatted_address, cuisine, latitude, longitude
+                source = EXCLUDED.source,
+                website = EXCLUDED.website
+            RETURNING restaurant_id, external_place_id, name, formatted_address, cuisine, latitude, longitude, website
             """,
-            (external_place_id, name, location, formatted_address, cuisine, lat, lon)
+            (external_place_id, name, location, formatted_address, cuisine, lat, lon, website)
         )
 
         row = cur.fetchone()
@@ -98,7 +111,8 @@ def search_restaurants():
             "latitude": row[5],
             "longitude": row[6],
             "distance": distance,
-            "phone": phone
+            "phone": phone,
+            "website": row[7],
         })
 
     conn.commit()
