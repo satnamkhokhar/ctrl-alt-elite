@@ -14,98 +14,72 @@ function MatchScreen () {
             style={styles.container}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            >
+            > 
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.DineSync}>{'\n'}DineSync</Text>
+                
+                <Text style={styles.rowTwo}>{'\n\n'}the results are in...</Text>
 
-            <SafeAreaView style={styles.header}>
-                <TouchableOpacity>
-                    <Image
-                        source={require('../../assets/share.png')}
-                        style={styles.mediumLogo}
-                    />
-                </TouchableOpacity>
-            
-                <Text style={styles.DineSync}>{'\n'}DineSync</Text> 
-            
-                <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
-                    <Image
-                        source={require('../../assets/profile.png')}
-                        style={styles.mediumLogo}
-                    />
-                </TouchableOpacity>
-            </SafeAreaView>
+                <Text style={styles.rowThree}>#1{'\n'}#2{'\n'}#3</Text>
 
-            <SafeAreaView style={styles.messageContainer}>
-                <Text style={styles.message}>the results are in...</Text>
-            </SafeAreaView>
-
-            <SafeAreaView style={styles.columnsContainer}>
-                <SafeAreaView style={styles.ranking}><Text style={styles.rankingFont}>#1{'\n'}#2{'\n'}#3</Text></SafeAreaView>
-
-                <SafeAreaView style={styles.resturantInfo}>
-                <TouchableOpacity>
+                <TouchableOpacity style={styles.logoButton}>
                        <Image
                             source={require('../../assets/phone.png')}
-                            style={styles.smallLogo}
+                            style={styles.phone}
                         />
                 </TouchableOpacity>
         
-                <TouchableOpacity>
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
                     source={require('../../assets/map.png')}
-                    style={styles.smallLogo}
+                    style={styles.map}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image
-                    source={require('../../assets/heart.png')}
-                    style={styles.smallLogo}
-                    />
-                </TouchableOpacity>
-                </SafeAreaView>
-            </SafeAreaView>
 
-            <SafeAreaView style={styles.columnsContainer}>
-                <SafeAreaView style={styles.newSessionButton}>
+                <TouchableOpacity style={styles.DineSync}>
+                    <Image
+                    source={require('../../assets/share.png')}
+                    style={styles.share}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.DineSync} onPress={() => navigation.navigate('UserProfile')}>
+                    <Image
+                    source={require('../../assets/profile.png')}
+                    style={styles.profile}
+                    />
+                </TouchableOpacity>
+                
                 <TouchableOpacity style={styles.button}>
                         <Text style={styles.buttonText}>Start A New Session</Text>
                 </TouchableOpacity>
-                </SafeAreaView>
-                
-                <SafeAreaView>
-                    <TouchableOpacity style={styles.saveGroup}>
-                        <Image 
-                            source={require('../../assets/group.png')}
-                            style={styles.mediumLogo}
-                        />
-                    </TouchableOpacity>
-                    
-                </SafeAreaView>
-            </SafeAreaView>
 
-            <SafeAreaView style={styles.footer}>
-                <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
-                    <Image
-                        source={require('../../assets/star.png')}
-                        style={styles.mediumLogo}
-                    />
+                <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>Save This Group</Text>
                 </TouchableOpacity>
-                        
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+            
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
-                        source={require('../../assets/house.png')}
-                        style={styles.mediumLogo}
+                    source={require('../../assets/star.png')}
+                    style={styles.star}
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
-                        source={require('../../assets/messages.png')}
-                        style={styles.mediumLogo}
+                    source={require('../../assets/search.png')}
+                    style={styles.search}
                     />
-                </TouchableOpacity>      
-                
-            </SafeAreaView>
+                </TouchableOpacity>
 
+                <TouchableOpacity style={styles.logoButton}>
+                    <Image
+                    source={require('../../assets/group.png')}
+                    style={styles.group}
+                    />
+                </TouchableOpacity>
+
+            </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
     );
@@ -115,96 +89,107 @@ function MatchScreen () {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    header: {
-        flexDirection: "row",
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        justifyContent: "space-between",
-        
-    }, 
     DineSync: {
         fontSize: 35,
         fontWeight: 'bold',
         fontStyle: 'italic',
         color: 'white',
+        flex: 1,
+        justifyContent: 'flex-start'
     },
-    messageContainer: {
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    message: {
+    rowTwo: {
+        position: 'absolute',
         fontSize: 40,
         fontWeight: 'bold',
         color: 'white',
+        top:  30,
+        left: -45
     },
-    columnsContainer: {
-        flexDirection: "row"
-    },
-    rankingFont: {
+    rowThree: {
+        position: 'absolute',
         fontSize: 100,
         fontWeight: 'bold',
         color: 'white',
-        
+        top:  175,
+        left: -15
+
     }, 
-    ranking: {
-        width: "50%",
-        paddingHorizontal: 20,
-    },
-    resturantInfo: {
-        width: "50%",
-        paddingVertical: 30,
-        paddingHorizontal: 150,
-    },
-    smallLogo: {
-        height: 25,
-        width: 25,
-        marginBottom: 15,
-    },
-    mediumLogo: {
-        height: 50,
-        width: 50,
-    },
     button: {
         alignItems: 'center',
         borderColor:'white',
         borderWidth: 2,
         height: 50,
-        width: 250,
+        width: 300,
         borderRadius: 8,
         marginTop: 15,
         justifyContent: 'center',
         backgroundColor: 'white',
         opacity: .45,
     },
+    logoButton: {
+        alignItems: 'center',
+        height: 30,
+        width: 150,
+        marginBottom: 8,
+        justifyContent: 'center',
+    },
     buttonText: {
-        color:'#f00b0bff',
-        fontSize: 22,
+        ccolor:'#f00b0bff',
+        fontSize: 25,
         fontWeight:'bold',
         textAlign:'center',
     },
-    footer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: 15,
-        paddingHorizontal: 30,
+    phone: {
+        position: 'absolute',
+        top:  50,
+        left: 200,
+        width: 25,
+        height: 25,
     },
-    saveGroup: {
-        justifyContent: "center",
-        alignItems: "center",
-        width: "38%",
-        borderColor:'white',
-        borderWidth: 2,
+    map: {
+        position: 'absolute',
+        top: 50,
+        left: 200,
+        width: 25,
+        height: 25,
+    },
+    share: {
+        position: 'absolute',
+        top: -210,
+        left: -175,
+        width: 55,
+        height: 55,
+    },
+    profile: {
+        position: 'absolute',
+        top: -373,
+        left: 125,
+        width: 50,
         height: 50,
-        width: 150,
-        borderRadius: 8,
-        marginTop: -15,
     },
-    newSessionButton: {
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: -30,
-        width: "62%",
+    star: {
+        position: 'absolute',
+        top: 60,
+        left: -75,
+        width: 50,
+        height: 50,
+    },
+    search: {
+        position: 'absolute',
+        top: 25,
+        left: 60,
+        width: 45,
+        height: 45,
+    },
+    group: {
+        position: 'absolute',
+        top: -40,
+        left: 155,
+        width: 100,
+        height: 100,
     },
 });
 

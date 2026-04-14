@@ -26,83 +26,76 @@ function UserProfile () {
             end={{ x: 1, y: 1 }}
             > 
            
-            <SafeAreaView style={styles.header}>
-                <TouchableOpacity>
-                <Image
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.DineSync}>{'\n'}DineSync</Text>
+
+                <TouchableOpacity style={styles.DineSync}>
+                    <Image
                     source={require('../../assets/share.png')}
-                    style={styles.mediumLogo}
+                    style={styles.share}
+                    />
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.DineSync}>
+                    <Image
+                    source={require('../../assets/profile.png')}
+                    style={styles.profile}
                     />
                 </TouchableOpacity>
 
-                <Text style={styles.DineSync}>{'\n'}DineSync</Text> 
-
-                <TouchableOpacity onPress={() => signout()}>
-                    <Text style={styles.Text}>Logout</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
-
-            <SafeAreaView style={styles.profilecontainer}>
-                
                 <Image
                 source={require('../../assets/profilepic.png')}
                 style={styles.profilepic}
                 />
 
-                <Text style={styles.Name}>
-                {userData.firstName} {userData.lastName}{'\n'}@{userData.username} 
-                </Text>
-            </SafeAreaView>
+                <Text style={styles.Name}>                                           First Last{'\n'}                                           username </Text>
 
-            <SafeAreaView style={styles.profifleAspects}>
-                 <Image
+                <Text style={styles.atSymbol}>@</Text>
+
+
+                <TouchableOpacity style={styles.logoButton}>
+                    <Image
                     source={require('../../assets/heart.png')}
-                    style={styles.smallLogo}
-                />
-
-                <Text style={styles.Text}>  favorites</Text>
-            </SafeAreaView>
-
-            <SafeAreaView style={styles.profifleAspectsContainer}>
+                    style={styles.heart}
+                    />
+                </TouchableOpacity>
+                <Text style={styles.Text}>             favorites</Text>
+                
                 <Separator/>
-            </SafeAreaView>
 
-            <SafeAreaView style={styles.profifleAspects}>
-                <Image
+                <TouchableOpacity style={styles.logoButton}>
+                    <Image
                     source={require('../../assets/clock.png')}
-                    style={styles.smallLogo}
-                />
-                 
-                 <Text style={styles.Text}> recents</Text>
+                    style={styles.clock}
+                    />
+                </TouchableOpacity>
 
-            </SafeAreaView>
+                <Text style={styles.Text}>{'\n\n\n\n\n'}             recents</Text>
 
-            <SafeAreaView style={styles.profifleAspectsContainer}>
                 <Separator/>
-            </SafeAreaView>
 
-            <SafeAreaView style={styles.footer}>
-                 <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
                     source={require('../../assets/star.png')}
-                    style={styles.mediumLogo}
+                    style={styles.star}
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/house.png')}
-                    style={styles.mediumLogo}
+                    source={require('../../assets/search.png')}
+                    style={styles.search}
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
+                <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/messages.png')}
-                    style={styles.mediumLogo}
+                    source={require('../../assets/group.png')}
+                    style={styles.group}
                     />
                 </TouchableOpacity>
+
             </SafeAreaView>
-
             </LinearGradient>
         </SafeAreaProvider>
     );
@@ -111,40 +104,18 @@ function UserProfile () {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        //alignItems: 'center',
     },
-    header: {
-        flexDirection: "row",
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        justifyContent: "space-between",
-        
-    }, 
     DineSync: {
         fontSize: 35,
         fontWeight: 'bold',
         fontStyle: 'italic',
         color: 'white',
+        position: 'absolute',
+        top: -10,
+        left: 140,
     }, 
-    profilecontainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-
-    },
-    profifleAspects: {
-        flexDirection: "row",
-        paddingHorizontal: 10,
-    },
-    profifleAspectsContainer: {
-        marginTop: -20,
-        marginBottom: 150,
-    },
-    footer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 45,
-        paddingHorizontal: 30,
-        paddingVertical: 10,
-    },
     separator: {
         height: 1,
         width: '100%',
@@ -162,21 +133,92 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-    smallLogo: {
+    heart: {
+        top: 35,
+        left: -40,
         width: 20,
         height: 20,
     },
-    mediumLogo: {
+    clock: {
+        top: 155,
+        left: -40,
+        width: 20,
+        height: 20, 
+    },
+    button: {
+        alignItems: 'center',
+        borderColor:'white',
+        borderWidth: 2,
+        height: 50,
+        width: 300,
+        borderRadius: 8,
+        marginTop: 15,
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        opacity: .45,
+    },
+    logoButton: {
+        alignItems: 'center',
+        height: 30,
+        width: 150,
+        marginBottom: 8,
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color:'#f00b0bff',
+        fontSize: 25,
+        fontWeight:'bold',
+        textAlign:'center',
+    },
+    share: {
+        position: 'absolute',
+        top: 35,
+        left: -120,
+        width: 55,
+        height: 55,
+    },
+    profile: {
+        position: 'absolute',
+        top: 40,
+        left: 210,
         width: 50,
         height: 50,
     },
     profilepic: {
+        position: 'absolute',
+        top: 110,
+        left: 165,
         width: 100,
         height: 100,
     },
-    group: {
+    atSymbol: {
+        fontSize: 20,
+        color: 'white',
+        fontWeight: 'bold',
+        position: 'absolute',
+        top: 220,
+        left: 150,
+    },
+    star: {
+        position: 'absolute',
+        top: 300,
+        left: 60,
         width: 50,
         height: 50,
+    },
+    search: {
+        position: 'absolute',
+        top: 265,
+        left: 185,
+        width: 45,
+        height: 45,
+    },
+    group: {
+        position: 'absolute',
+        top: 200,
+        left: 290,
+        width: 100,
+        height: 100,
     },
 });
 
