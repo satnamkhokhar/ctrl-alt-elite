@@ -253,6 +253,178 @@ export const createSession = async (budget, maxDistance) => {
     }
 };
 
+// Search users by name or username
+export const searchUsers = async (query) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/users/search?query=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to search users' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const sendFriendRequest = async (receiverId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/request`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ receiver_id: receiverId }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to send friend request' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const acceptFriendRequest = async (friendshipId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/accept/${friendshipId}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to accept friend request' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const declineFriendRequest = async (friendshipId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/decline/${friendshipId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to decline friend request' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const unfriend = async (friendId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/${friendId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to unfriend' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getFriends = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to get friends' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getFriendRequests = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/requests`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to get friend requests' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getFriendshipStatus = async (userId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/friends/status/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to get friendship status' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
 // Get user details by user ID (for displaying participant names)
 export const getUserDetails = async (userId) => {
     try {

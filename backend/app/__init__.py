@@ -24,6 +24,7 @@ def create_app():
     from .routes.restaurants import restaurants_bp
     from .routes.votes import votes_bp
     from .routes.users import users_bp
+    from .routes.friends import friends_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(restaurants_bp, url_prefix='/restaurants')
@@ -32,6 +33,7 @@ def create_app():
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
     app.register_blueprint(votes_bp, url_prefix='/votes')
     app.register_blueprint(users_bp, url_prefix='/users')
+    app.register_blueprint(friends_bp, url_prefix='/friends')
 
     return app
 

@@ -10,6 +10,10 @@ import SessionLobbyScreen from "./src/screens/SessionLobbyScreen";
 import SessionScreen from './src/screens/SessionScreen';
 import SwipeCardScreensScreen from './src/screens/SwipeCardScreen';
 import WaitingScreen from './src/screens/WaitingScreen';
+import FriendsScreen from './src/screens/FriendsScreen';
+import FriendRequestsScreen from './src/screens/FriendRequestsScreen';
+import SearchUsersScreen from './src/screens/SearchUsersScreen';
+import OtherUserProfileScreen from './src/screens/OtherUserProfileScreen';
 
 //allows the app to switch screens
 const Stack = createNativeStackNavigator();
@@ -28,7 +32,11 @@ export default function App() {
             <Stack.Screen name='SessionLobbyScreen' component={SessionLobbyScreen} />
             <Stack.Screen name='SessionScreen' component={SessionScreen} />
             <Stack.Screen name='JoinSessionScreen' component={JoinSessionScreen} />
+            <Stack.Screen name='FriendsScreen' component={FriendsScreen} />
+            <Stack.Screen name='FriendRequestsScreen' component={FriendRequestsScreen} />
+            <Stack.Screen name='SearchUsersScreen' component={SearchUsersScreen} />
+            <Stack.Screen name='OtherUserProfileScreen' component={OtherUserProfileScreen} />
         </Stack.Navigator>
-    </NavigationContainer>   
+    </NavigationContainer>
     );
 }

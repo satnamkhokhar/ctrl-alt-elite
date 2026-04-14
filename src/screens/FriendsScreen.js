@@ -1,196 +1,217 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
-import { FlatList, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-//import filter from 'lodash.filter';
-//import { ActivityIndicator, FlatList, Image, View} from 'react-native';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { getFriendRequests, getFriends, unfriend } from '../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
-//const API_ENDPOINT = 'url'
-
-function FriendsScreen () {
-    const[searchQuery, setSearchQuery] = useState("")
+function FriendsScreen() {
     const navigation = useNavigation();
-    const [isLoading, setIsLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [error, setError] = useState(null);
-    const [fullData, setFullData] = useState([]);
+    const [friends, setFriends] = useState([]);
+    const [pendingCount, setPendingCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
-/* the search feature, when connected to backend
-    const handleSearch = () => {
-        setSearchQuery(query);
-        const formattedQuery = query.toLowerCase();
-        const filteredData = filter(fullData, (user) => {
-            return contains(user, formattedQuery);
-        });
-        setData(filteredData);
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [])
+    );
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const [friendsRes, requestsRes] = await Promise.all([getFriends(), getFriendRequests()]);
+        if (friendsRes.success) setFriends(friendsRes.data);
+        if (requestsRes.success) setPendingCount(requestsRes.data.length);
+        setIsLoading(false);
     };
 
-    const contains = ({name, username}, query) => {
-        const {first, last} = name;
-
-        if(
-        first.includes(query) || 
-        last.includes(query) || 
-        username.includes(query)
-    ) {
-            return true;
-        }
-        return false;
-    }
-    
-    useEffect(() => {
-        setIsLoading(true);
-        fetchData(API_ENDPOINT);
-    }, []);
-
-    const fetchData = async(url) => {
-        try {
-            const response = await fetch(url);
-            const json = await response.json();
-            setData(json.results);
-
-            console.log(json.results);
-            setFullData(json.results);
-            setIsLoading(false);
-        } catch(error) {
-
-            setError(error);
-            console.log();
-        }
-    }
-
-    if( isLoading ) {
-        return (
-            <SafeAreaView style={styles.loading}>
-                <ActivityIndicator size={'large'} color='white'/>
-            </SafeAreaView>
+    const handleUnfriend = (friend) => {
+        Alert.alert(
+            'Unfriend',
+            `Remove ${friend.first_name} ${friend.last_name} from your friends?`,
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Unfriend',
+                    style: 'destructive',
+                    onPress: async () => {
+                        const result = await unfriend(friend.user_id);
+                        if (result.success) {
+                            setFriends((prev) => prev.filter((f) => f.user_id !== friend.user_id));
+                        } else {
+                            Alert.alert('Error', result.error);
+                        }
+                    },
+                },
+            ]
         );
-    }
+    };
 
-    if( error ) {
-        return (
-            <SafeAreaView style={styles.loading}>
-                <Text>Error in fetching data ... Please check your internet connection!</Text>
-            </SafeAreaView>
-        )
-    }
-*/
+    const renderFriend = ({ item }) => (
+        <TouchableOpacity
+            style={styles.friendRow}
+            onPress={() => navigation.navigate('OtherUserProfileScreen', { userId: item.user_id })}
+        >
+            <View style={styles.friendInfo}>
+                <Text style={styles.friendName}>{item.first_name} {item.last_name}</Text>
+                <Text style={styles.friendUsername}>@{item.username}</Text>
+            </View>
+            <TouchableOpacity style={styles.unfriendButton} onPress={() => handleUnfriend(item)}>
+                <Text style={styles.unfriendText}>Unfriend</Text>
+            </TouchableOpacity>
+        </TouchableOpacity>
+    );
+
     return (
-        <SafeAreaProvider>    
-           <LinearGradient
-            colors={['#f00b0bff', '#c76d18ff']}
-            style={styles.container}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            > 
+        <SafeAreaProvider>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <SafeAreaView style={styles.inner}>
+                    <Text style={styles.title}>Friends</Text>
 
-            <SafeAreaView style={styles.searchBarContainer}>
-                <SafeAreaView style={styles.barContainer}>
-                    <TextInput style={styles.searchbar}
-                    placeholder='Search'
-                    placeholderTextColor="white"
-                    clearButtonMode='always'
-                    autoCapitalize='none'
-                    autoCorrect={false}
-                    //value={searchQuery}
-                    //onChangeText={(query) => handleSearch(query)}
-                />
-                </SafeAreaView>
-                <SafeAreaView style={styles.searchContainer}>
-                    <TouchableOpacity>
-                        <Image
-                            source={require('../../assets/search.png')}
-                            style={styles.mediumLogo}
-                        />
-                    </TouchableOpacity>
-                </SafeAreaView>
-            </SafeAreaView>
+                    <View style={styles.actionRow}>
+                        <TouchableOpacity
+                            style={styles.actionButton}
+                            onPress={() => navigation.navigate('FriendRequestsScreen')}
+                        >
+                            <Text style={styles.actionButtonText}>
+                                Requests{pendingCount > 0 ? ` (${pendingCount})` : ''}
+                            </Text>
+                        </TouchableOpacity>
 
-            <FlatList 
-            /*
-            data={data}
-            keyExtractor={(item) => item.username.key}
-            renderItem={({item}) => (
-                <View style={styles.itemContainer}>
-                    <Image source={{uri: item.profile.picture.key}} style={styles.image} />
-                    <View>
-                        <Text> style={styles.textName}{item.name.first} {item.name.last}</Text>
-                        <Text> style={styles.textUsername}{item.username}</Text>
+                        <TouchableOpacity
+                            style={styles.actionButton}
+                            onPress={() => navigation.navigate('SearchUsersScreen')}
+                        >
+                            <Text style={styles.actionButtonText}>Find Friends</Text>
+                        </TouchableOpacity>
                     </View>
 
-                </View>
-            )} */
-            />
-                
+                    {isLoading ? (
+                        <ActivityIndicator size="large" color="white" style={styles.loader} />
+                    ) : friends.length === 0 ? (
+                        <Text style={styles.emptyText}>No friends yet. Search to add some!</Text>
+                    ) : (
+                        <FlatList
+                            data={friends}
+                            keyExtractor={(item) => String(item.user_id)}
+                            renderItem={renderFriend}
+                            contentContainerStyle={styles.list}
+                        />
+                    )}
+                </SafeAreaView>
+
+                <SafeAreaView style={styles.footer}>
+                    <TouchableOpacity>
+                        <Text style={styles.footerIcon}>★</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                        <Text style={styles.footerIcon}>⌂</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
+                        <Text style={styles.footerIcon}>✉</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    searchBarContainer: {
-        marginHorizontal: 20,
-        flexDirection: "row",
-    },
-    searchbar: {
+    inner: {
+        flex: 1,
         paddingHorizontal: 20,
+        paddingTop: 20,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 16,
+    },
+    actionRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        gap: 12,
+    },
+    actionButton: {
+        flex: 1,
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 8,
         paddingVertical: 10,
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+    },
+    actionButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 15,
+    },
+    loader: {
+        marginTop: 40,
+    },
+    emptyText: {
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 40,
+        fontSize: 16,
+        fontStyle: 'italic',
+    },
+    list: {
+        paddingBottom: 20,
+    },
+    friendRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 10,
+    },
+    friendInfo: {
+        flex: 1,
+    },
+    friendName: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    friendUsername: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 13,
+        marginTop: 2,
+    },
+    unfriendButton: {
         borderColor: 'white',
         borderWidth: 1,
-        borderRadius: 8,
-        color: "white",
-        marginTop: 20,
+        borderRadius: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
     },
-    searchContainer: {
-        width: "10%",
-        marginTop: 25,
-        marginLeft: 15,
-    },
-    barContainer: {
-        width: "90%",
-    },
-    loading: {
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center',
-    },
-    itemContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginLeft: 10,
-        marginTop: 10,
-    },
-    image: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-    },
-    textName: {
-        fontSize: 17,
-        marginLeft: 10,
-        fontWeight: "600",
-    },
-    textUsername: {
-        fontSize: 14,
-        marginLeft: 10,
-
+    unfriendText: {
+        color: 'white',
+        fontSize: 13,
     },
     footer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 240,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         paddingHorizontal: 30,
         paddingVertical: 10,
     },
-    mediumLogo: {
-        height: 30,
-        width: 30,
+    footerIcon: {
+        fontSize: 30,
+        color: 'white',
     },
 });
 
-export default FriendsScreen
+export default FriendsScreen;
