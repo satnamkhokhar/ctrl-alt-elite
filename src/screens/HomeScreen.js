@@ -19,14 +19,14 @@ function HomeScreen () {
             <SafeAreaView style={styles.header}>
                 <TouchableOpacity>
                     <Image
-                        source={require('../../assets/share.png')}
+                        source={require('../../assets/images/share.png')}
                         style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
             
                 <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
                     <Image
-                        source={require('../../assets/profile.png')}
+                        source={require('../../assets/images/profile.png')}
                         style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
@@ -39,14 +39,14 @@ function HomeScreen () {
             <SafeAreaView style={styles.swipingContainer}>
                  <TouchableOpacity>
                        <Image
-                            source={require('../../assets/dollar-sign.png')}
+                            source={require('../../assets/images/dollar-sign.png')}
                             style={styles.dollarsign}
                         />
                 </TouchableOpacity>
     
                 <TouchableOpacity>
                     <Image
-                    source={require('../../assets/globe.png')}
+                    source={require('../../assets/images/globe.png')}
                     style={styles.globe}
                     />
                 </TouchableOpacity>
@@ -57,7 +57,7 @@ function HomeScreen () {
             </SafeAreaView>
 
             <SafeAreaView style={styles.swipingContainer}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MatchScreen')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SessionScreen')}>
                     <Text style={styles.buttonText}>Start Swiping</Text>
                 </TouchableOpacity>
             </SafeAreaView>
@@ -66,21 +66,21 @@ function HomeScreen () {
             <SafeAreaView style={styles.footer}>
                 <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
                     <Image
-                        source={require('../../assets/star.png')}
+                        source={require('../../assets/images/star.png')}
                         style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
             
                 <TouchableOpacity>
                     <Image
-                        source={require('../../assets/house.png')}
+                        source={require('../../assets/images/house.png')}
                         style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
             
                 <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
                     <Image
-                        source={require('../../assets/messages.png')}
+                        source={require('../../assets/images/messages.png')}
                         style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
