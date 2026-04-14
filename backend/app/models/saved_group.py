@@ -1,8 +1,8 @@
 from .user import db
 from datetime import datetime
 
-class SavedGroup(db.Model):
-    __tablename__ = 'saved_groups'
+class GroupHistory(db.Model):
+    __tablename__ = 'group_history'
 
     group_id = db.Column(db.BigInteger, primary_key=True)
     group_name = db.Column(db.String(255), nullable=False)
