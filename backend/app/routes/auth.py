@@ -14,7 +14,8 @@ def register():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-
+    dietary_restrictions = data.get('dietary_restrictions')  # NEW: comma-separated string
+    
     #checks that every field was actually sent
     if not all([first_name, last_name, username, email, password]):
         return jsonify({'error': 'all fields are required'}), 400 # 400 means a bad request
@@ -36,7 +37,8 @@ def register():
         last_name=last_name,
         username=username,
         email=email,
-        password_hash=password_hash.decode('utf-8') #decode converts the bytes back to a string
+        password_hash=password_hash.decode('utf-8'), #decode converts the bytes back to a string
+        dietary_restrictions=dietary_restrictions
     )
 
     db.session.add(new_user) #stages the new user to be saved
@@ -63,5 +65,5 @@ def login():
     #Creates a JWT token using the user's id as their identity
     access_token = create_access_token(identity=str(user.user_id))
 
-    return jsonify({'access_token': access_token}), 200 # 200 means success, sends token to frontend
+    return jsonify({'access_token': access_token, 'user_id': user.user_id}), 200 # 200 means success, sends token to frontend
 

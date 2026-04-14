@@ -5,6 +5,9 @@ import EmailPassword from './src/screens/EmailPassword';
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import NamesScreen from './src/screens/NamesScreen';
+import JoinSessionScreen from './src/screens/JoinSessionScreen';
+import SessionLobbyScreen from "./src/screens/SessionLobbyScreen";
+import SessionScreen from './src/screens/SessionScreen';
 import SwipeCardScreensScreen from './src/screens/SwipeCardScreen';
 import WaitingScreen from './src/screens/WaitingScreen';
 
@@ -22,6 +25,9 @@ export default function App() {
             <Stack.Screen name='DietaryRestrictionsScreen' component={DietaryRestrictionsScreen} />
             <Stack.Screen name='SwipeCardScreen' component={SwipeCardScreensScreen} />
             <Stack.Screen name='WaitingScreen' component={WaitingScreen} />
+            <Stack.Screen name='SessionLobbyScreen' component={SessionLobbyScreen} />
+            <Stack.Screen name='SessionScreen' component={SessionScreen} />
+            <Stack.Screen name='JoinSessionScreen' component={JoinSessionScreen} />
         </Stack.Navigator>
     </NavigationContainer>   
     );

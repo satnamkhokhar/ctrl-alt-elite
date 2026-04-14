@@ -16,7 +16,7 @@ export const loginUser = async (email, password) => { // handles the login fetch
         const data = await response.json(); // reads the JSON response
 
         if (response.ok) {
-            return { success: true, token: data.access_token }; // returns the token on success
+            return { success: true, token: data.access_token, userId: data.user_id }; // returns the token on success
         } else {
             return { success: false, error: data.error || 'login failed' }; // returns the error message on failure
         }
@@ -146,6 +146,132 @@ export const finalizeSession = async (sessionId) => {
             return { success: true, data };
         } else {
             return { success: false, error: data.error || 'failed to finalize session' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+// Get session details including member list
+export const getSessionDetails = async (sessionId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+
+        const response = await fetch(`${BASE_URL}/sessions/${sessionId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+        return { success: true, data }; // Returns: {session_id, budget, max_distance, active_users, members, created_at }
+        } else {
+            return { success: false, error: data.error || 'failed to fetch session details' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const joinSession = async (sessionId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+
+        const response = await fetch(`${BASE_URL}/sessions/${sessionId}/join`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to join session' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const startSession = async (sessionId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+
+        const response = await fetch(`${BASE_URL}/sessions/${sessionId}/start`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to start session' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const createSession = async (budget, maxDistance) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+
+        const response = await fetch(`${BASE_URL}/sessions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ budget, max_distance: maxDistance }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to create session' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+// Get user details by user ID (for displaying participant names)
+export const getUserDetails = async (userId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+
+        const response = await fetch(`${BASE_URL}/users/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, data }; // Returns { user_id, username, first_name, last_name, email }
+        } else {
+            return { success: false, error: data.error || 'failed to fetch user details' };
         }
     } catch (error) {
         console.error('network error:', error);

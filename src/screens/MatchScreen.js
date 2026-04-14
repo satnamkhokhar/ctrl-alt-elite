@@ -3,7 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-function HomeScreen() {
+function MatchScreen () {
+
     const navigation = useNavigation();
 
     return (
@@ -16,76 +17,68 @@ function HomeScreen() {
             > 
             <SafeAreaView style={styles.container}>
                 <Text style={styles.DineSync}>{'\n'}DineSync</Text>
-                <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text> 
                 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('SessionScreen')}
-                >
-                    <Text style={styles.buttonText}>Start Session</Text>
+                <Text style={styles.rowTwo}>{'\n\n'}the results are in...</Text>
+
+                <Text style={styles.rowThree}>#1{'\n'}#2{'\n'}#3</Text>
+
+                <TouchableOpacity style={styles.logoButton}>
+                       <Image
+                            source={require('../../assets/phone.png')}
+                            style={styles.phone}
+                        />
+                </TouchableOpacity>
+        
+                <TouchableOpacity style={styles.logoButton}>
+                    <Image
+                    source={require('../../assets/map.png')}
+                    style={styles.map}
+                    />
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('JoinSessionScreen')}
-                >
-                    <Text style={styles.buttonText}>Join Session</Text>
+                <TouchableOpacity style={styles.DineSync}>
+                    <Image
+                    source={require('../../assets/share.png')}
+                    style={styles.share}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.DineSync} onPress={() => navigation.navigate('UserProfile')}>
+                    <Image
+                    source={require('../../assets/profile.png')}
+                    style={styles.profile}
+                    />
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>Start A New Session</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>Save This Group</Text>
                 </TouchableOpacity>
             
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                        source={require('../../assets/dollar-sign.png')}
-                        style={styles.dollarSign}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/cuisine.png')}
-                        style={styles.cuisine}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/map.png')}
-                        style={styles.map}
+                    source={require('../../assets/star.png')}
+                    style={styles.star}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                        source={require('../../assets/share.png')}
-                        style={styles.share}
+                    source={require('../../assets/search.png')}
+                    style={styles.search}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                        source={require('../../assets/profile.png')}
-                        style={styles.profile}
-                    />
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/star.png')}
-                        style={styles.star}
+                    source={require('../../assets/group.png')}
+                    style={styles.group}
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/search.png')}
-                        style={styles.search}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/group.png')}
-                        style={styles.group}
-                    />
-                </TouchableOpacity>
-            
             </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
@@ -100,15 +93,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     DineSync: {
-        fontSize: 75,
+        fontSize: 35,
         fontWeight: 'bold',
         fontStyle: 'italic',
         color: 'white',
+        flex: 1,
+        justifyContent: 'flex-start'
     },
     rowTwo: {
-        fontSize: 12,
+        position: 'absolute',
+        fontSize: 40,
         fontWeight: 'bold',
         color: 'white',
+        top:  30,
+        left: -45
+    },
+    rowThree: {
+        position: 'absolute',
+        fontSize: 100,
+        fontWeight: 'bold',
+        color: 'white',
+        top:  175,
+        left: -15
 
     }, 
     button: {
@@ -131,43 +137,36 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonText: {
-        color:'#f00b0bff',
+        ccolor:'#f00b0bff',
         fontSize: 25,
         fontWeight:'bold',
         textAlign:'center',
     },
-    dollarSign: {
+    phone: {
         position: 'absolute',
-        top:  -140,
-        left: -40,
-        width: 50,
-        height: 50,
-    },
-    cuisine: {
-        position: 'absolute',
-        top: -180,
-        left: 55,
-        width: 60,
-        height: 60,
+        top:  50,
+        left: 200,
+        width: 25,
+        height: 25,
     },
     map: {
         position: 'absolute',
-        top: -210,
-        left: 150,
-        width: 45,
-        height: 45,
+        top: 50,
+        left: 200,
+        width: 25,
+        height: 25,
     },
     share: {
         position: 'absolute',
-        top: -440,
-        left: -100,
+        top: -210,
+        left: -175,
         width: 55,
         height: 55,
     },
     profile: {
         position: 'absolute',
-        top: -475,
-        left: 200,
+        top: -373,
+        left: 125,
         width: 50,
         height: 50,
     },
@@ -194,4 +193,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeScreen;
+export default MatchScreen

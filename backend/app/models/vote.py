@@ -7,5 +7,10 @@ class Vote(db.Model):
     session_id = db.Column(db.BigInteger, db.ForeignKey('sessions.session_id', ondelete='CASCADE'), nullable=False)
     restaurant_id = db.Column(db.BigInteger, db.ForeignKey('restaurants.restaurant_id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
-    vote_value = db.Column(db.String(20), nullable=False)
+    vote_value = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+
+    # Prevent duplicate votes: one vote per user per restaurant per session
+    __table_args__ = (
+        db.UniqueConstraint('session_id', 'user_id', 'restaurant_id', name='unique_vote'),
+    )

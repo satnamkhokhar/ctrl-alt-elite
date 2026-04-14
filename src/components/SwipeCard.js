@@ -1,10 +1,19 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const getCategoryLabel = (restaurant) => {
-    if (restaurant.category) return restaurant.category;
-    if (restaurant.cuisine) return restaurant.cuisine;
-    if (restaurant.categories && restaurant.categories.length > 0) {
-        return restaurant.categories[0];
+    const raw = restaurant.cuisine || restaurant.category;
+    if (raw) {
+        // Clean up raw Geoapify tags like "building, building.catering, catering.restaurant.italian"
+        const parts = raw.split(',').map(s => s.trim());
+        for (const part of parts.reverse()) {
+            const segments = part.split('.');
+            if (segments.length >= 3 && segments[0] === 'catering') {
+                return segments[segments.length - 1].replace(/_/g, ' ')
+                    .replace(/\b\w/g, c => c.toUpperCase());
+            }
+        }
+        // If it's already a clean label (no dots), return it
+        if (!raw.includes('.')) return raw;
     }
     return 'Restaurant';
 };
@@ -60,7 +69,9 @@ function SwipeCard({ restaurant }) {
             <View style={styles.infoBox}>
                 <Text style={styles.infoLabel}>Address</Text>
                 <Text style={styles.infoText}>
-                    {restaurant.formatted_address || restaurant.address || 'Address unavailable'}
+                    {restaurant.formatted_address
+                        ? restaurant.formatted_address.split(', ').slice(1).join(', ')
+                        : 'Address unavailable'}
                 </Text>
             </View>
 
@@ -69,6 +80,19 @@ function SwipeCard({ restaurant }) {
                 <Text style={styles.infoText}>
                     {restaurant.phone || restaurant.phone_number || 'Phone unavailable'}
                 </Text>
+            </View>
+
+            <View style={styles.infoBox}>
+                <Text style={styles.infoLabel}>Website</Text>
+                {restaurant.website ? (
+                    <TouchableOpacity onPress={() => Linking.openURL(restaurant.website)}>
+                        <Text style={[styles.infoText, styles.link]}>
+                            {restaurant.website}
+                        </Text>
+                    </TouchableOpacity>
+                ) : (
+                    <Text style={styles.infoText}>Website unavailable</Text>
+                )}
             </View>
         </View>
     );
@@ -82,7 +106,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'black',
         paddingVertical: 20,
-        paddingHorizontal: 18,  
+        paddingHorizontal: 18,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -130,6 +154,10 @@ const styles = StyleSheet.create({
     infoText: {
         fontSize: 14,
         textAlign: 'center',
+    },
+    link: {
+        color: '#f00b0bff',
+        textDecorationLine: 'underline',
     },
 });
 

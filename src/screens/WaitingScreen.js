@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { checkSessionStatus, finalizeSession } from '../services/api';
 
 function WaitingScreen({ route, navigation }) {
@@ -32,10 +33,17 @@ function WaitingScreen({ route, navigation }) {
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
-                <ActivityIndicator size="large" color="black" />
-                <Text style={styles.text}>{message}</Text>
-            </SafeAreaView>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <SafeAreaView style={styles.container}>
+                    <ActivityIndicator size="large" color="white" />
+                    <Text style={styles.text}>{message}</Text>
+                </SafeAreaView>
+            </LinearGradient>
         </SafeAreaProvider>
     );
 }
@@ -43,7 +51,6 @@ function WaitingScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'pink',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
@@ -52,6 +59,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 22,
         fontWeight: 'bold',
+        color: 'white',
         textAlign: 'center',
     },
 });
