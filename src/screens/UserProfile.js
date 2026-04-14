@@ -1,14 +1,21 @@
-import { useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useContext } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { UserContext } from '../components/UserContext';
+import { useUser } from '../components/useUser';
 
 function UserProfile () {
     const Separator = () => <View style={styles.separator} />;
-    const route = useRoute();
-    //const { userName } = route.params;
-    //const { firstName } = route.params;
-    //const { lastName } = route.params;
+    const { userData } = useContext(UserContext);
+    const { logout } = useUser();
+    const navigation = useNavigation()
+
+    const signout = () => {
+        logout();
+        navigation.navigate('LoginScreen');
+    }
 
     return (
         <SafeAreaProvider>    

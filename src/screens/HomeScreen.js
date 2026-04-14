@@ -3,9 +3,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-function HomeScreen() {
-    const navigation = useNavigation();
+function HomeScreen () {
 
+    const navigation = useNavigation();
+    
     return (
         <SafeAreaProvider>    
            <LinearGradient
@@ -14,79 +15,77 @@ function HomeScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             > 
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.DineSync}>{'\n'}DineSync</Text>
-                <Text style={styles.rowTwo}>{'\n\n\n\n'}Price Range            Cuisine              Location</Text> 
-                
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('SessionScreen')}
-                >
-                    <Text style={styles.buttonText}>Start Session</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('JoinSessionScreen')}
-                >
-                    <Text style={styles.buttonText}>Join Session</Text>
-                </TouchableOpacity>
-            
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/dollar-sign.png')}
-                        style={styles.dollarSign}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/cuisine.png')}
-                        style={styles.cuisine}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/map.png')}
-                        style={styles.map}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
+            <SafeAreaView style={styles.header}>
+                <TouchableOpacity>
                     <Image
                         source={require('../../assets/share.png')}
-                        style={styles.share}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/profile.png')}
-                        style={styles.profile}
-                    />
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/star.png')}
-                        style={styles.star}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/search.png')}
-                        style={styles.search}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                        source={require('../../assets/group.png')}
-                        style={styles.group}
+                        style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
             
+                <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
+                    <Image
+                        source={require('../../assets/profile.png')}
+                        style={styles.mediumLogo}
+                    />
+                </TouchableOpacity>
             </SafeAreaView>
+
+            <SafeAreaView style={styles.DineSyncContainer}>
+                <Text style={styles.DineSync}>DineSync</Text>
+            </SafeAreaView>
+
+            <SafeAreaView style={styles.swipingContainer}>
+                 <TouchableOpacity>
+                       <Image
+                            source={require('../../assets/dollar-sign.png')}
+                            style={styles.dollarsign}
+                        />
+                </TouchableOpacity>
+    
+                <TouchableOpacity>
+                    <Image
+                    source={require('../../assets/globe.png')}
+                    style={styles.globe}
+                    />
+                </TouchableOpacity>
+            </SafeAreaView>
+
+            <SafeAreaView style={styles.swipingContainer}>
+                <Text style={styles.specificationsLabel}>Price Range                               Location</Text>
+            </SafeAreaView>
+
+            <SafeAreaView style={styles.swipingContainer}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MatchScreen')}>
+                    <Text style={styles.buttonText}>Start Swiping</Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+
+
+            <SafeAreaView style={styles.footer}>
+                <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
+                    <Image
+                        source={require('../../assets/star.png')}
+                        style={styles.mediumLogo}
+                    />
+                </TouchableOpacity>
+            
+                <TouchableOpacity>
+                    <Image
+                        source={require('../../assets/house.png')}
+                        style={styles.mediumLogo}
+                    />
+                </TouchableOpacity>
+            
+                <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
+                    <Image
+                        source={require('../../assets/messages.png')}
+                        style={styles.mediumLogo}
+                    />
+                </TouchableOpacity>
+            </SafeAreaView>
+            
             </LinearGradient>
         </SafeAreaProvider>
     );
@@ -96,8 +95,17 @@ function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+    },
+    header: {
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        justifyContent: "space-between",
+        marginBottom: 100,
+    },
+    DineSyncContainer: {
+        alignItems: "center",
+        justifyContent: "center",
     },
     DineSync: {
         fontSize: 75,
@@ -105,30 +113,35 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         color: 'white',
     },
-    rowTwo: {
+    swipingContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+
+    },
+    specificationsLabel: {
         fontSize: 12,
         fontWeight: 'bold',
         color: 'white',
-
     }, 
+    dollarsign: {
+        height: 50,
+        width: 50,
+        marginRight: 100,
+    },
+    globe: {
+        height: 45,
+        width: 45,
+    },
     button: {
-        alignItems: 'center',
         borderColor:'white',
         borderWidth: 2,
         height: 50,
         width: 300,
         borderRadius: 8,
         marginTop: 15,
-        justifyContent: 'center',
         backgroundColor: 'white',
         opacity: .45,
-    },
-    logoButton: {
-        alignItems: 'center',
-        height: 30,
-        width: 150,
-        marginBottom: 8,
-        justifyContent: 'center',
     },
     buttonText: {
         color:'#f00b0bff',
@@ -136,62 +149,17 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         textAlign:'center',
     },
-    dollarSign: {
-        position: 'absolute',
-        top:  -140,
-        left: -40,
+     mediumLogo: {
         width: 50,
         height: 50,
     },
-    cuisine: {
-        position: 'absolute',
-        top: -180,
-        left: 55,
-        width: 60,
-        height: 60,
-    },
-    map: {
-        position: 'absolute',
-        top: -210,
-        left: 150,
-        width: 45,
-        height: 45,
-    },
-    share: {
-        position: 'absolute',
-        top: -440,
-        left: -100,
-        width: 55,
-        height: 55,
-    },
-    profile: {
-        position: 'absolute',
-        top: -475,
-        left: 200,
-        width: 50,
-        height: 50,
-    },
-    star: {
-        position: 'absolute',
-        top: 60,
-        left: -75,
-        width: 50,
-        height: 50,
-    },
-    search: {
-        position: 'absolute',
-        top: 25,
-        left: 60,
-        width: 45,
-        height: 45,
-    },
-    group: {
-        position: 'absolute',
-        top: -40,
-        left: 155,
-        width: 100,
-        height: 100,
+     footer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 240,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
     },
 });
 
-export default HomeScreen;
+export default HomeScreen
