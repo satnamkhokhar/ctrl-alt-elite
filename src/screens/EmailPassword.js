@@ -3,45 +3,52 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from '@react-navigation/native';
-
+//import { useUser } from '../components/useUser';
 
 function EmailPassword () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [verifyPassword, setVerifyPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const navigation = useNavigation();
-    const route = useRoute();
-    const { firstName, lastName, username } = route.params || {};
+    //const { user, register } = useUser();
 
     //saves the users email, password, and the verification password
-    const handleRegistration = () => {
+    const handleRestistration = () => {
+        console.log('email:', email);
+        console.log('password:', password);
+        console.log('password:', verifyPassword);
         validateLogin();
-    }
+
+        /* 
+        try {
+            await register(email, password)
+            console.log('current user is:', user)
+        } catch (error) {
+        }
+   */
+   }
+        
 
     const validateLogin = () => {
+        setEmail(email);
+        setPassword(password);
+        setVerifyPassword(verifyPassword);
         //checks if the user responded to every prompt
         if (email.length === 0 || password.length === 0 ) {
-            return setErrorMessage('please enter a response into every box');
+            setErrorMessage('please enter a response into every box')
         }
         //checks if the email is valid
-        if (!validator.validate(email)) {
-            return setErrorMessage('please enter a valid email address.');
-        }
-
+        if (validator.validate(email)) {
+            setErrorMessage('');
+        } else { return setErrorMessage('please enter a valid email address.');}
+   
         //checks the password to meet the requirements
         if (password.length < 6 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\W/.test(password)) {
-            return setErrorMessage('password must have: \n at least 6 characters \n at least one capital letter \n at least one lowercase letter \n at least one special character');
-        }
-
+                return setErrorMessage('password have: \n at least 6 characters \n at least one capital letter \n at least one lowercase letter \n at least one special character'); 
+            } else {setErrorMessage('')}
+        
         //checks if the password matches the verification password
-        if (password !== verifyPassword) {
-            return setErrorMessage('passwords must match');
-        }
-
-        // All validation passed — move to next screen
-        navigation.navigate('DietaryRestrictionsScreen', { firstName, lastName, username, email, password });
+        if (password === verifyPassword) {} else {return setErrorMessage('passwords must match')};
     }
 
     return (
@@ -57,6 +64,7 @@ function EmailPassword () {
                 <TextInput
                 style={styles.input}
                 placeholder='enter your email'
+                placeholderTextColor="white"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize='none'
@@ -65,6 +73,7 @@ function EmailPassword () {
                 <TextInput
                 style={styles.input}
                 placeholder='enter your password'
+                placeholderTextColor="white"
                 value={password}
                 onChangeText={setPassword}
                 autoCapitalize='none'
@@ -74,12 +83,13 @@ function EmailPassword () {
                 <TextInput
                 style={styles.input}
                 placeholder='verify your password'
+                placeholderTextColor="white"
                 value={verifyPassword}
                 onChangeText={setVerifyPassword}
                 autoCapitalize='none'
                 secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleRegistration}>
+                <TouchableOpacity style={styles.button} onPress={handleRestistration}>
                     <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
                 {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text>: null}
@@ -94,6 +104,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        justifyContent:'center'
     },
     label: {
         fontSize: 16,
@@ -104,8 +115,8 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: 'white',
-        height: 30,
-        width: 175,
+        height: 40,
+        width: 200,
         fontSize: 16,
         marginBottom: 16,
         borderRadius: 8,
@@ -114,21 +125,20 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        borderColor: 'white',
+        borderColor:'white',
         borderWidth: 2,
-        height: 50,
-        width: 300,
+        height: 30,
+        width: 75,
         borderRadius: 8,
-        marginTop: 15,
         justifyContent: 'center',
-        backgroundColor: 'white',
-        opacity: .45,
+        marginBottom: 8,
     },
     buttonText: {
-        color: '#f00b0bff',
-        fontSize: 25,
-        fontWeight: 'bold',
-        textAlign: 'center',
+        color:'white',
+        fontSize: 16,
+        fontWeight:'bold',
+        textAlign:'center',
+        justifyContent: 'center'
     },
     errorText: {
         color: 'white',

@@ -1,8 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { UserContext } from '../components/UserContext';
 
 function NamesScreen () {
     const [firstName, setFirstName] = useState('');
@@ -10,46 +11,24 @@ function NamesScreen () {
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
+    const { setUserData } = useContext(UserContext);
 
     //checks if there is a first name, last name, and username entered
     const isNameEntered = firstName.trim().length > 0 && lastName.trim().length > 0 && username.trim().length > 0;
 
     //saves the users first name, last name, and username
     const handleNames = () => {
+        setUserData({ firstName, lastName, username });
+        navigation.navigate('UserProfile');
         console.log('firstName', firstName);
         console.log('lastName:', lastName);
         console.log('username', username);
         
         //moves to the next screen
-        navigation.navigate('EmailPassword', { firstName, lastName, username });
+        navigation.navigate('EmailPassword');      
     }
 
-/* checks if the username is taken, should work after
-we connect the frontend and backend but i can't test it until we connect
-    
-    //const [availabilityMessage, setAvailabiltyMessage] = useState('');
-    //const [isTaken, setIsTaken] = useState(false);
 
-    const checkUsernameAvailability = async (inputUsername) => {
-        try {
-            const response = await fetch('backend URL {inputUsername}');
-            const data = await response.json();
-
-            setIsTaken(data.isTaken);
-            setAvailabiltyMessage(data.message);
-        } catch (error) {
-            console.error('error checking username:', error);
-            setAvailabilityMessage('error checking availability');
-        }
-        }
-
-    const handleChangeText = (text) => {
-        setUsername(text);
-        checkUsernameAvailability(text);
-        }
-
-    }
-*/
     return (
         <SafeAreaProvider>
             <LinearGradient
@@ -63,6 +42,7 @@ we connect the frontend and backend but i can't test it until we connect
                 <TextInput
                 style={styles.input}
                 placeholder='enter your first name'
+                placeholderTextColor="white"
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize='none'
@@ -71,6 +51,7 @@ we connect the frontend and backend but i can't test it until we connect
                 <TextInput
                 style={styles.input}
                 placeholder='enter your last name'
+                placeholderTextColor="white"
                 value={lastName}
                 onChangeText={setLastName}
                 autoCapitalize='none'
@@ -79,6 +60,7 @@ we connect the frontend and backend but i can't test it until we connect
                 <TextInput
                 style={styles.input}
                 placeholder='enter your username'
+                placeholderTextColor="white"
                 value={username}
                 onChangeText={setUsername}
                 // switch the onChangeText when the backend is connected to be
@@ -118,8 +100,8 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: 'white',
-        height: 30,
-        width: 175,
+        height: 40,
+        width: 200,
         fontSize: 16,
         marginBottom: 16,
         borderRadius: 8,
@@ -128,22 +110,49 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        borderColor: 'white',
+        borderColor:'white',
         borderWidth: 2,
-        height: 50,
-        width: 300,
+        height: 30,
+        width: 75,
         borderRadius: 8,
-        marginTop: 15,
+        marginBottom: 8,
+        marginTop: 8,
         justifyContent: 'center',
-        backgroundColor: 'white',
-        opacity: .45,
+        color: 'white',
     },
     buttonText: {
-        color: '#f00b0bff',
-        fontSize: 25,
-        fontWeight: 'bold',
-        textAlign: 'center',
+        color:'white',
+        fontSize: 16,
+        fontWeight:'bold',
+        textAlign:'center',
     },
 });
 
 export default NamesScreen
+
+/* checks if the username is taken, should work after
+we connect the frontend and backend but i can't test it until we connect
+    
+    //const [availabilityMessage, setAvailabiltyMessage] = useState('');
+    //const [isTaken, setIsTaken] = useState(false);
+
+    const checkUsernameAvailability = async (inputUsername) => {
+        try {
+            const response = await fetch('backend URL {inputUsername}');
+            const data = await response.json();
+
+            setIsTaken(data.isTaken);
+            setAvailabiltyMessage(data.message);
+        } catch (error) {
+            console.error('error checking username:', error);
+            setAvailabilityMessage('error checking availability');
+        }
+        }
+
+    const handleChangeText = (text) => {
+        setUsername(text);
+        checkUsernameAvailability(text);
+        }
+
+    }
+*/

@@ -1,10 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { loginUser } from '../services/api';
+//import { useUser } from '../components/useUser';
 
 
 function LoginScreen () {
@@ -12,21 +11,21 @@ function LoginScreen () {
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
     const [message, setMessage] = useState('');
+    const [isTaken, setIsTaken] = useState(false);
+    
+    //const { login } = useUser()
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            return setMessage('please enter your email and password');
+    //saves the login info
+    const handleLogin = () => {
+        console.log('email:', email);
+        console.log('password:', password);
+    /*
+        try {
+            await login(email, password)
+        } catch (error) {
+
         }
-
-        const result = await loginUser(email, password);
-
-        if (result.success) {
-            await AsyncStorage.setItem('token', result.token);
-            await AsyncStorage.setItem('user_id', result.userId.toString());
-            navigation.navigate('HomeScreen');
-        } else {
-            setMessage(result.error);
-        }
+    */
     }
 
     return (
@@ -44,6 +43,7 @@ function LoginScreen () {
                 <TextInput
                 style={styles.input}
                 placeholder='enter your email'
+                placeholderTextColor="white"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType='email-address'
@@ -53,19 +53,19 @@ function LoginScreen () {
                 <TextInput
                 style={styles.input}
                 placeholder='enter your password'
+                placeholderTextColor="white"
                 value={password}
                 onChangeText={setPassword}
                 autoCapitalize='none'
                 secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleLogin} testID="loginButton">
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HomeScreen')} testID="loginButton">
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NamesScreen')} testID="createAccountButton">
                     <Text style={styles.buttonText}>Create Account</Text>
                 </TouchableOpacity>
-                {message ? <Text style={styles.errorText}>{message}</Text> : null}
             </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: 'white',
-        height: 30,
-        width: 175,
+        height: 40,
+        width: 200,
         fontSize: 16,
         marginBottom: 20,
         borderRadius: 8,
@@ -98,33 +98,27 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        borderColor: 'white',
+        borderColor:'white',
         borderWidth: 2,
-        height: 50,
-        width: 300,
+        height: 30,
+        width: 150,
         borderRadius: 8,
-        marginTop: 15,
+        marginBottom: 8,
         justifyContent: 'center',
         backgroundColor: 'white',
         opacity: .45,
     },
     buttonText: {
-        color: '#f00b0bff',
-        fontSize: 25,
-        fontWeight: 'bold',
-        textAlign: 'center',
+        color:'red',
+        fontSize: 16,
+        fontWeight:'bold',
+        textAlign:'center',
     },
     DineSync: {
         fontSize: 75,
         fontWeight: 'bold',
         fontStyle: 'italic',
         color: 'white',
-    },
-    errorText: {
-        color: 'white',
-        fontWeight: 'bold',
-        marginTop: 8,
-        textAlign: 'center',
     },
 });
 
