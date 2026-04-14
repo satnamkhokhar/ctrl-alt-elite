@@ -18,7 +18,7 @@ function GroupScreen () {
             <SafeAreaView style={styles.header}>
                 <TouchableOpacity>
                 <Image
-                    source={require('../../assets/share.png')}
+                    source={require('../../assets/images/share.png')}
                     style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
@@ -27,7 +27,7 @@ function GroupScreen () {
 
                 <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
                     <Image
-                    source={require('../../assets/profile.png')}
+                    source={require('../../assets/images/profile.png')}
                     style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
@@ -37,21 +37,21 @@ function GroupScreen () {
             <SafeAreaView style={styles.footer}>
                  <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
                     <Image
-                    source={require('../../assets/star.png')}
+                    source={require('../../assets/images/star.png')}
                     style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
                     <Image
-                    source={require('../../assets/house.png')}
+                    source={require('../../assets/images/house.png')}
                     style={styles.mediumLogo}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity>
                     <Image
-                    source={require('../../assets/messages.png')}
+                    source={require('../../assets/images/messages.png')}
                     style={styles.mediumLogo}
                     />
                 </TouchableOpacity>

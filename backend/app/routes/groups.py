@@ -4,7 +4,6 @@ from ..models.user import db, User
 from ..models.saved_group import GroupHistory, SavedGroupMember
 
 groups_bp = Blueprint('groups', __name__, url_prefix='/groups')
-group = GroupHistory.query.get(group_id)
 
 # Create group
 @groups_bp.route('', methods=['POST'])
@@ -65,7 +64,7 @@ def get_groups():
             user = m.user
             member_data.append({
                 "user_id": user.user_id,
-                "name": user.name,
+                "name": f"{user.first_name} {user.last_name}",
                 "email": user.email
             })
 
@@ -95,7 +94,7 @@ def get_group(group_id):
         user = m.user
         member_data.append({
             "user_id": user.user_id,
-            "name": user.name,
+            "name": f"{user.first_name} {user.last_name}",
             "email": user.email
         })
 

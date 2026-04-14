@@ -24,28 +24,28 @@ function MatchScreen () {
 
                 <TouchableOpacity style={styles.logoButton}>
                        <Image
-                            source={require('../../assets/phone.png')}
+                            source={require('../../assets/images/phone.png')}
                             style={styles.phone}
                         />
                 </TouchableOpacity>
         
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/map.png')}
+                    source={require('../../assets/images/map.png')}
                     style={styles.map}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.DineSync}>
                     <Image
-                    source={require('../../assets/share.png')}
+                    source={require('../../assets/images/share.png')}
                     style={styles.share}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.DineSync} onPress={() => navigation.navigate('UserProfile')}>
                     <Image
-                    source={require('../../assets/profile.png')}
+                    source={require('../../assets/images/profile.png')}
                     style={styles.profile}
                     />
                 </TouchableOpacity>
@@ -60,21 +60,21 @@ function MatchScreen () {
             
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/star.png')}
+                    source={require('../../assets/images/star.png')}
                     style={styles.star}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/search.png')}
+                    source={require('../../assets/images/search.png')}
                     style={styles.search}
                     />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.logoButton}>
                     <Image
-                    source={require('../../assets/group.png')}
+                    source={require('../../assets/images/group.png')}
                     style={styles.group}
                     />
                 </TouchableOpacity>

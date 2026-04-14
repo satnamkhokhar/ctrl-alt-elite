@@ -245,7 +245,7 @@ export const createSession = async (budget, maxDistance) => {
         if (response.ok) {
             return { success: true, data };
         } else {
-            return { success: false, error: data.error || 'failed to create session' };
+            return { success: false, error: data.error || data.msg || 'failed to create session' };
         }
     } catch (error) {
         console.error('network error:', error);

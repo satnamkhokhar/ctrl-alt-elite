@@ -32,7 +32,7 @@ function SessionLobbyScreen() {
         }
 
         const location = await Location.getCurrentPositionAsync({});
-        const storedUserId = await AsyncStorage.getItem('user_id');
+        const storedUserId = await AsyncStorage.getItem('userId');
 
         navigation.navigate('SwipeCardScreen', {
             sessionId,
@@ -65,7 +65,7 @@ function SessionLobbyScreen() {
             const participantData = await Promise.all(participantPromises);
             setParticipants(participantData);
 
-            const storedUserId = await AsyncStorage.getItem('user_id');
+            const storedUserId = await AsyncStorage.getItem('userId');
             setCurrentUserId(storedUserId);
             setIsHost(result.data.members[0] === parseInt(storedUserId));
 
