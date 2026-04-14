@@ -20,7 +20,6 @@ def create_app():
     #Register blueprints - each blueprint is a group of related routes
     from .routes.auth import auth_bp
     from .routes.groups import groups_bp
-    #from .routes.restaurants import restaurants_bp
     from .routes.sessions import sessions_bp
     from .routes.restaurants import restaurants_bp
     #from .routes.sessions import sessions_bp
