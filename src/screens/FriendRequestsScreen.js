@@ -9,6 +9,7 @@ function FriendRequestsScreen() {
     const navigation = useNavigation();
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [actioningId, setActioningId] = useState(null);
 
     useEffect(() => {
         loadRequests();
@@ -26,21 +27,27 @@ function FriendRequestsScreen() {
     };
 
     const handleAccept = async (friendshipId) => {
+        if (actioningId) return;
+        setActioningId(friendshipId);
         const result = await acceptFriendRequest(friendshipId);
         if (result.success) {
             setRequests((prev) => prev.filter((r) => r.friendship_id !== friendshipId));
         } else {
             Alert.alert('Error', result.error);
         }
+        setActioningId(null);
     };
 
     const handleDecline = async (friendshipId) => {
+        if (actioningId) return;
+        setActioningId(friendshipId);
         const result = await declineFriendRequest(friendshipId);
         if (result.success) {
             setRequests((prev) => prev.filter((r) => r.friendship_id !== friendshipId));
         } else {
             Alert.alert('Error', result.error);
         }
+        setActioningId(null);
     };
 
     const renderRequest = ({ item }) => (
@@ -54,14 +61,16 @@ function FriendRequestsScreen() {
             </TouchableOpacity>
             <View style={styles.buttonGroup}>
                 <TouchableOpacity
-                    style={[styles.actionButton, styles.acceptButton]}
+                    style={[styles.actionButton, styles.acceptButton, actioningId === item.friendship_id && { opacity: 0.6 }]}
                     onPress={() => handleAccept(item.friendship_id)}
+                    disabled={!!actioningId}
                 >
-                    <Text style={styles.buttonText}>Accept</Text>
+                    <Text style={styles.buttonText}>{actioningId === item.friendship_id ? '...' : 'Accept'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.actionButton, styles.declineButton]}
+                    style={[styles.actionButton, styles.declineButton, actioningId === item.friendship_id && { opacity: 0.6 }]}
                     onPress={() => handleDecline(item.friendship_id)}
+                    disabled={!!actioningId}
                 >
                     <Text style={styles.buttonText}>Decline</Text>
                 </TouchableOpacity>

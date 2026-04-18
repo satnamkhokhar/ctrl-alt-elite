@@ -15,6 +15,12 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
+        from .models import saved_group  # noqa
+        from .models.friendship import Friendship  # noqa
+        from .models.session import Session, SessionUser  # noqa
+        from .models.session_restaurant import SessionRestaurant  # noqa
+        from .models.vote import Vote  # noqa
+        from .models.restaurant import Restaurant  # noqa
         db.create_all()
 
     #Register blueprints - each blueprint is a group of related routes

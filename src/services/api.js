@@ -3,6 +3,11 @@ import Constants from 'expo-constants'; // imports Expo constants to get the loc
 
 const BASE_URL = `http://${Constants.expoConfig.hostUri.split(':')[0]}:5001`; // builds the base URL using the same IP Expo is running on
 
+export const clearSession = async () => {
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('userId');
+};
+
 export const loginUser = async (email, password) => { // handles the login fetch call
     try {
         const response = await fetch(`${BASE_URL}/auth/login`, {
@@ -397,6 +402,160 @@ export const getFriendRequests = async () => {
             return { success: true, data };
         } else {
             return { success: false, error: data.error || 'failed to get friend requests' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const storeSessionRestaurants = async (sessionId, restaurantIds) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/sessions/${sessionId}/restaurants`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ restaurant_ids: restaurantIds }),
+        });
+        const data = await response.json();
+        return response.ok ? { success: true, data } : { success: false, error: data.error };
+    } catch (error) {
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getSessionRestaurants = async (sessionId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/sessions/${sessionId}/restaurants`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        return response.ok ? { success: true, data } : { success: false, error: data.error };
+    } catch (error) {
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getGroups = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/groups`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, groups: data };
+        } else {
+            return { success: false, error: data.error || 'failed to get groups' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const createGroup = async (groupName, userIds) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/groups`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ group_name: groupName, user_ids: userIds }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to create group' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const deleteGroup = async (groupId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/groups/${groupId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.error || 'failed to delete group' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const getFavorites = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/users/me`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, favorites: data.favorite_restaurants };
+        } else {
+            return { success: false, error: data.error || 'failed to get favorites' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const addFavorite = async (restaurantId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/users/me/favorites`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ restaurant_id: restaurantId }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.error || 'failed to add favorite' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const removeFavorite = async (restaurantId) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/users/me/favorites/${restaurantId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.error || 'failed to remove favorite' };
         }
     } catch (error) {
         console.error('network error:', error);

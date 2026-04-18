@@ -6,7 +6,7 @@ class GroupHistory(db.Model):
 
     group_id = db.Column(db.BigInteger, primary_key=True)
     group_name = db.Column(db.String(255), nullable=False)
-    created_by_user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     members = db.relationship('SavedGroupMember', backref='group', cascade="all, delete")
@@ -19,3 +19,5 @@ class SavedGroupMember(db.Model):
     group_id = db.Column(db.BigInteger, db.ForeignKey('group_history.group_id'), nullable=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
     added_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', foreign_keys=[user_id])

@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { createSession } from '../services/api';
+import { clearSession, createSession } from '../services/api';
 
 export default function SessionScreen() {
     const navigation = useNavigation();
@@ -27,6 +27,9 @@ export default function SessionScreen() {
 
         if (result.success) {
             setSessionId(result.data.session_id);
+        } else if (result.error?.toLowerCase().includes('expired') || result.error?.toLowerCase().includes('unauthorized')) {
+            await clearSession();
+            navigation.reset({ index: 0, routes: [{ name: 'loginScreen' }] });
         } else {
             setErrorMessage(result.error);
         }
@@ -45,6 +48,14 @@ export default function SessionScreen() {
                 end={{ x: 1, y: 1 }}
             >
                 <SafeAreaView style={styles.container}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                            <Image
+                                source={require('../../assets/images/house.png')}
+                                style={styles.homeIcon}
+                            />
+                        </TouchableOpacity>
+                    </View>
                     <KeyboardAvoidingView
                         style={styles.container}
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -117,6 +128,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
+    },
+    header: {
+        paddingHorizontal: 16,
+        paddingTop: 8,
+    },
+    homeIcon: {
+        width: 36,
+        height: 36,
     },
     title: {
         fontSize: 32,

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token #creates a JWT token when login is successful
 from ..models.user import db, User
+from datetime import timedelta
 import bcrypt
 
 auth_bp = Blueprint('auth', __name__)
@@ -63,7 +64,7 @@ def login():
         return jsonify({'error': 'invalid email or password'}), 401 #401 means unauthorized
 
     #Creates a JWT token using the user's id as their identity
-    access_token = create_access_token(identity=str(user.user_id))
+    access_token = create_access_token(identity=str(user.user_id), expires_delta=timedelta(days=30))
 
     return jsonify({'access_token': access_token, 'user_id': user.user_id}), 200 # 200 means success, sends token to frontend
 

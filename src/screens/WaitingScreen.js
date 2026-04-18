@@ -1,35 +1,50 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { checkSessionStatus, finalizeSession } from '../services/api';
 
 function WaitingScreen({ route, navigation }) {
     const { sessionId } = route.params;
-    const [message, setMessage] = useState('Waiting for others...');
-    // Temporary: this screen will just keep showing this "waiting" since the votes backend needs to be completed to show the results!
+    const [message, setMessage] = useState('Waiting for others to finish...');
+    const [canFinalize, setCanFinalize] = useState(false);
+    const [finalizing, setFinalizing] = useState(false);
+    const navigatedRef = useRef(false);
+
+    const handleFinalize = async () => {
+        if (navigatedRef.current) return;
+        setFinalizing(true);
+        const finalizeResult = await finalizeSession(sessionId);
+        if (finalizeResult.success) {
+            navigatedRef.current = true;
+            navigation.navigate('MatchScreen', {
+                restaurant: finalizeResult.data.winning_restaurant,
+                topRestaurants: finalizeResult.data.top_restaurants,
+            });
+        } else {
+            setMessage(finalizeResult.error || 'Could not finalize session.');
+            setFinalizing(false);
+        }
+    };
 
     useEffect(() => {
         const interval = setInterval(async () => {
+            if (navigatedRef.current) return;
             const statusResult = await checkSessionStatus(sessionId);
 
-            if (statusResult.success && statusResult.data.finished) {
-                const finalizeResult = await finalizeSession(sessionId);
-
-                if (finalizeResult.success) {
-                    //(MatchFoundScreen): will be moved to the restaurant match screen once its built, for now it goes back to the home screen.
-                    navigation.navigate('HomeScreen', {
-                        winningRestaurantId: finalizeResult.data.winning_restaurant_id,
-                        winningScore: finalizeResult.data.winning_score,
-                    });
+            if (statusResult.success) {
+                if (statusResult.data.finished) {
+                    clearInterval(interval);
+                    await handleFinalize();
                 } else {
-                    setMessage(finalizeResult.error);
+                    // Show manual finalize button after 30 seconds as fallback
+                    setCanFinalize(true);
                 }
             }
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [sessionId, navigation]);
+    }, [sessionId]);
 
     return (
         <SafeAreaProvider>
@@ -42,6 +57,13 @@ function WaitingScreen({ route, navigation }) {
                 <SafeAreaView style={styles.container}>
                     <ActivityIndicator size="large" color="white" />
                     <Text style={styles.text}>{message}</Text>
+
+                    {canFinalize && (
+                        <TouchableOpacity style={[styles.button, finalizing && { opacity: 0.6 }]} onPress={handleFinalize} disabled={finalizing}>
+                            <Text style={styles.buttonText}>{finalizing ? 'Loading results...' : "Everyone's Done? See Results"}</Text>
+                        </TouchableOpacity>
+                    )}
+                    {finalizing && <Text style={styles.subText}>Finding your match...</Text>}
                 </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
@@ -60,6 +82,28 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         color: 'white',
+        textAlign: 'center',
+    },
+    subText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: 'rgba(255,255,255,0.8)',
+        textAlign: 'center',
+    },
+    button: {
+        marginTop: 30,
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 24,
+        backgroundColor: 'white',
+        opacity: 0.85,
+    },
+    buttonText: {
+        color: '#f00b0bff',
+        fontSize: 18,
+        fontWeight: 'bold',
         textAlign: 'center',
     },
 });

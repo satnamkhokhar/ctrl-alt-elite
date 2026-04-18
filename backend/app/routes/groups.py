@@ -21,7 +21,7 @@ def create_group():
     # create group
     group = GroupHistory(
         group_name=group_name,
-        created_by_user_id=current_user_id
+        user_id=current_user_id
     )
 
     db.session.add(group)
@@ -71,7 +71,7 @@ def get_groups():
         result.append({
             "group_id": group.group_id,
             "group_name": group.group_name,
-            "created_by": group.created_by_user_id,
+            "created_by": group.user_id,
             "members": member_data
         })
 
@@ -101,7 +101,7 @@ def get_group(group_id):
     return jsonify({
         "group_id": group.group_id,
         "group_name": group.group_name,
-        "created_by": group.created_by_user_id,
+        "created_by": group.user_id,
         "members": member_data
     }), 200
 
@@ -117,7 +117,7 @@ def delete_group(group_id):
     if not group:
         return jsonify({"error": "Group not found"}), 404
 
-    if group.created_by_user_id != current_user_id:
+    if str(group.user_id) != str(current_user_id):
         return jsonify({"error": "Only creator can delete this group"}), 403
 
     db.session.delete(group)

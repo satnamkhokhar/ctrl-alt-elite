@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { getFriendRequests, getFriends, unfriend } from '../services/api';
 import { useFocusEffect } from '@react-navigation/native';
@@ -107,14 +107,14 @@ function FriendsScreen() {
                 </SafeAreaView>
 
                 <SafeAreaView style={styles.footer}>
-                    <TouchableOpacity>
-                        <Text style={styles.footerIcon}>★</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
+                        <Image source={require('../../assets/images/profile.png')} style={styles.footerIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                        <Text style={styles.footerIcon}>⌂</Text>
+                        <Image source={require('../../assets/images/house.png')} style={styles.footerIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
-                        <Text style={styles.footerIcon}>✉</Text>
+                        <Image source={require('../../assets/images/group.png')} style={styles.groupIcon} />
                     </TouchableOpacity>
                 </SafeAreaView>
             </LinearGradient>
@@ -205,12 +205,17 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 30,
+        alignItems: 'center',
+        paddingHorizontal: 20,
         paddingVertical: 10,
     },
     footerIcon: {
-        fontSize: 30,
-        color: 'white',
+        width: 50,
+        height: 50,
+    },
+    groupIcon: {
+        width: 90,
+        height: 90,
     },
 });
 

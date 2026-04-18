@@ -3,7 +3,7 @@ import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View
 import Swiper from 'react-native-deck-swiper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { castVote, fetchRestaurants } from '../services/api';
+import { castVote, fetchRestaurants, storeSessionRestaurants, getSessionRestaurants } from '../services/api';
 import SwipeCard from '../components/SwipeCard';
 
 function SwipeCardScreen({ route, navigation }) {
@@ -13,30 +13,42 @@ function SwipeCardScreen({ route, navigation }) {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const { sessionId, userId, latitude, longitude, radius, dietary } = route.params || {};
+    const { sessionId, userId, isHost, latitude, longitude, radius, dietary } = route.params || {};
 
     useEffect(() => {
         const loadRestaurants = async () => {
             setLoading(true);
 
-            const result = await fetchRestaurants({
-                latitude,
-                longitude,
-                radius,
-                dietary,
-            });
-
-            if (result.success) {
-                setRestaurants(result.restaurants);
+            if (isHost) {
+                // Host fetches from Geoapify and stores the list for everyone
+                const result = await fetchRestaurants({ latitude, longitude, radius, dietary });
+                if (result.success) {
+                    const limited = result.restaurants.slice(0, 10);
+                    const ids = limited.map(r => r.restaurant_id);
+                    await storeSessionRestaurants(sessionId, ids);
+                    setRestaurants(limited);
+                } else {
+                    setErrorMessage(result.error);
+                }
             } else {
-                setErrorMessage(result.error);
+                // Non-host polls until the host has stored the restaurant list
+                let ready = false;
+                while (!ready) {
+                    const result = await getSessionRestaurants(sessionId);
+                    if (result.success && result.data.ready) {
+                        setRestaurants(result.data.restaurants.slice(0, 10));
+                        ready = true;
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
             }
 
             setLoading(false);
         };
 
         loadRestaurants();
-    }, [latitude, longitude, radius, dietary]);
+    }, [sessionId, isHost]);
 
     const handleVote = async (index, voteValue) => {
     const restaurant = restaurants[index];

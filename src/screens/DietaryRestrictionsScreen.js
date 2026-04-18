@@ -1,9 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Checkbox from 'expo-checkbox';
-import { registerUser } from '../services/api';
+import { registerUser, loginUser } from '../services/api';
 
 function DietaryRestrictionsScreen({ navigation, route }) {
     const { firstName, lastName, username, email, password } = route.params;
@@ -17,6 +18,7 @@ function DietaryRestrictionsScreen({ navigation, route }) {
     });
 
     const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleCheckbox = (key) => {
         setRestrictions({
@@ -26,6 +28,9 @@ function DietaryRestrictionsScreen({ navigation, route }) {
     };
 
     const handleRegister = async () => {
+        setIsLoading(true);
+        setErrorMessage('');
+
         const selected = Object.keys(restrictions)
             .filter((key) => restrictions[key])
             .join(",");
@@ -40,10 +45,17 @@ function DietaryRestrictionsScreen({ navigation, route }) {
         });
 
         if (result.success) {
+            // Auto-login after registration to get a token
+            const loginResult = await loginUser(email, password);
+            if (loginResult.success) {
+                await AsyncStorage.setItem('token', loginResult.token);
+                await AsyncStorage.setItem('userId', String(loginResult.userId));
+            }
             navigation.navigate('HomeScreen');
         } else {
             setErrorMessage(result.error || 'Registration failed');
         }
+        setIsLoading(false);
     };
 
     return (
@@ -69,8 +81,11 @@ function DietaryRestrictionsScreen({ navigation, route }) {
 
                     {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-                    <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                        <Text style={styles.buttonText}>Finish Registration</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
+                        {isLoading
+                            ? <ActivityIndicator color="#f00b0bff" />
+                            : <Text style={styles.buttonText}>Finish Registration</Text>
+                        }
                     </TouchableOpacity>
                 </SafeAreaView>
             </LinearGradient>
