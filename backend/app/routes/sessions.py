@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from ..models.session import Session, SessionUser
+from ..models.session_restaurant import SessionRestaurant
+from ..models.restaurant import Restaurant
 from ..models.user import db, User
 
 sessions_bp = Blueprint('sessions', __name__)
@@ -127,6 +129,63 @@ def join_session(session_id):
         'message': 'successfully joined the session',
         'session_id': session_id
     }), 200
+
+@sessions_bp.route('/<int:session_id>/restaurants', methods=['POST'])
+@jwt_required()
+def store_session_restaurants(session_id):
+    """Host calls this after fetching restaurants to lock in the shared list."""
+    session = db.session.get(Session, session_id)
+    if not session:
+        return jsonify({'error': 'session not found'}), 404
+
+    data = request.get_json()
+    restaurant_ids = data.get('restaurant_ids', [])
+
+    # Clear any previous list (in case host refreshes)
+    SessionRestaurant.query.filter_by(session_id=session_id).delete()
+
+    for position, rid in enumerate(restaurant_ids):
+        db.session.add(SessionRestaurant(
+            session_id=session_id,
+            restaurant_id=rid,
+            position=position
+        ))
+
+    db.session.commit()
+    return jsonify({'message': 'restaurants stored', 'count': len(restaurant_ids)}), 200
+
+
+@sessions_bp.route('/<int:session_id>/restaurants', methods=['GET'])
+@jwt_required()
+def get_session_restaurants(session_id):
+    """All users call this to get the same shared restaurant list."""
+    session = db.session.get(Session, session_id)
+    if not session:
+        return jsonify({'error': 'session not found'}), 404
+
+    rows = SessionRestaurant.query.filter_by(session_id=session_id).order_by(SessionRestaurant.position).all()
+
+    if not rows:
+        return jsonify({'ready': False, 'restaurants': []}), 200
+
+    ids = [r.restaurant_id for r in rows]
+    id_to_rest = {r.restaurant_id: r for r in Restaurant.query.filter(Restaurant.restaurant_id.in_(ids)).all()}
+
+    restaurants = []
+    for rid in ids:
+        r = id_to_rest.get(rid)
+        if r:
+            restaurants.append({
+                'restaurant_id': r.restaurant_id,
+                'name': r.name,
+                'cuisine': r.cuisine,
+                'formatted_address': r.formatted_address,
+                'latitude': float(r.latitude) if r.latitude else None,
+                'longitude': float(r.longitude) if r.longitude else None,
+            })
+
+    return jsonify({'ready': True, 'restaurants': restaurants}), 200
+
 
 @sessions_bp.route('/create-with-group', methods=['POST'])
 @jwt_required()

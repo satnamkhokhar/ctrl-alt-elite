@@ -19,13 +19,7 @@ function NamesScreen () {
     //saves the users first name, last name, and username
     const handleNames = () => {
         setUserData({ firstName, lastName, username });
-        navigation.navigate('UserProfile');
-        console.log('firstName', firstName);
-        console.log('lastName:', lastName);
-        console.log('username', username);
-        
-        //moves to the next screen
-        navigation.navigate('EmailPassword');      
+        navigation.navigate('EmailPassword');
     }
 
 

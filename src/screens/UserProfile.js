@@ -1,101 +1,118 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useContext } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { UserContext } from '../components/UserContext';
 import { useUser } from '../components/useUser';
+import { getUserDetails } from '../services/api';
 
 function UserProfile () {
-    const Separator = () => <View style={styles.separator} />;
-    const { userData } = useContext(UserContext);
+    const { userData, setUserData } = useContext(UserContext);
     const { logout } = useUser();
-    const navigation = useNavigation()
+    const navigation = useNavigation();
+    const [loading, setLoading] = useState(!userData.firstName);
+
+    useEffect(() => {
+        if (userData.firstName) return;
+        const fetchUser = async () => {
+            const userId = await AsyncStorage.getItem('userId');
+            if (!userId) return;
+            const result = await getUserDetails(userId);
+            if (result.success) {
+                setUserData({
+                    firstName: result.data.first_name,
+                    lastName: result.data.last_name,
+                    userName: result.data.username,
+                });
+            }
+            setLoading(false);
+        };
+        fetchUser();
+    }, []);
 
     const signout = () => {
         logout();
-        navigation.navigate('LoginScreen');
-    }
+        navigation.navigate('loginScreen');
+    };
 
     return (
-        <SafeAreaProvider>    
-           <LinearGradient
-            colors={['#f00b0bff', '#c76d18ff']}
-            style={styles.container}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            > 
-           
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.DineSync}>{'\n'}DineSync</Text>
+        <SafeAreaProvider>
+            <LinearGradient
+                colors={['#f00b0bff', '#c76d18ff']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <SafeAreaView style={styles.inner}>
 
-                <TouchableOpacity style={styles.DineSync}>
-                    <Image
-                    source={require('../../assets/images/share.png')}
-                    style={styles.share}
-                    />
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.DineSync}>
-                    <Image
-                    source={require('../../assets/images/profile.png')}
-                    style={styles.profile}
-                    />
-                </TouchableOpacity>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image
+                                source={require('../../assets/images/house.png')}
+                                style={styles.headerIcon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.title}>DineSync</Text>
+                        <View style={styles.headerIcon} />
+                    </View>
 
-                <Image
-                source={require('../../assets/images/profilepic.png')}
-                style={styles.profilepic}
-                />
+                    {/* Profile section */}
+                    <View style={styles.profileSection}>
+                        <Image
+                            source={require('../../assets/images/profilepic.png')}
+                            style={styles.profilepic}
+                        />
+                        {loading ? (
+                            <ActivityIndicator color="white" style={{ marginTop: 8 }} />
+                        ) : (
+                            <>
+                                <Text style={styles.name}>
+                                    {userData.firstName} {userData.lastName}
+                                </Text>
+                                <Text style={styles.username}>@{userData.userName}</Text>
+                            </>
+                        )}
+                    </View>
 
-                <Text style={styles.Name}>                                           First Last{'\n'}                                           username </Text>
+                    {/* Menu items */}
+                    <View style={styles.menu}>
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('FavoritesScreen')}>
+                            <Image
+                                source={require('../../assets/images/heart.png')}
+                                style={styles.menuIcon}
+                            />
+                            <Text style={styles.menuLabel}>Favorites</Text>
+                        </TouchableOpacity>
+                        <View style={styles.separator} />
 
-                <Text style={styles.atSymbol}>@</Text>
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('RecentsScreen')}>
+                            <Image
+                                source={require('../../assets/images/clock.png')}
+                                style={styles.menuIcon}
+                            />
+                            <Text style={styles.menuLabel}>Recents</Text>
+                        </TouchableOpacity>
+                        <View style={styles.separator} />
 
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('FriendsScreen')}>
+                            <Image
+                                source={require('../../assets/images/star.png')}
+                                style={styles.menuIcon}
+                            />
+                            <Text style={styles.menuLabel}>Friends</Text>
+                        </TouchableOpacity>
+                        <View style={styles.separator} />
+                    </View>
 
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                    source={require('../../assets/images/heart.png')}
-                    style={styles.heart}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.Text}>             favorites</Text>
-                
-                <Separator/>
+                    {/* Logout button */}
+                    <TouchableOpacity style={styles.logoutButton} onPress={signout}>
+                        <Text style={styles.logoutText}>Log Out</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                    source={require('../../assets/images/clock.png')}
-                    style={styles.clock}
-                    />
-                </TouchableOpacity>
-
-                <Text style={styles.Text}>{'\n\n\n\n\n'}             recents</Text>
-
-                <Separator/>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                    source={require('../../assets/images/star.png')}
-                    style={styles.star}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                    source={require('../../assets/images/search.png')}
-                    style={styles.search}
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.logoButton}>
-                    <Image
-                    source={require('../../assets/images/group.png')}
-                    style={styles.group}
-                    />
-                </TouchableOpacity>
-
-            </SafeAreaView>
+                </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
     );
@@ -104,122 +121,88 @@ function UserProfile () {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        //alignItems: 'center',
     },
-    DineSync: {
-        fontSize: 35,
+    inner: {
+        flex: 1,
+        paddingHorizontal: 20,
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+    },
+    title: {
+        fontSize: 28,
         fontWeight: 'bold',
         fontStyle: 'italic',
         color: 'white',
-        position: 'absolute',
-        top: -10,
-        left: 140,
-    }, 
-    separator: {
-        height: 1,
-        width: '100%',
-        backgroundColor: 'white',
-        marginTop: 0,
     },
-    Text: {
-        fontSize: 20,
-        color: 'white',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
+    headerIcon: {
+        width: 36,
+        height: 36,
     },
-    Name: {
-        fontSize: 16,
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    heart: {
-        top: 35,
-        left: -40,
-        width: 20,
-        height: 20,
-    },
-    clock: {
-        top: 155,
-        left: -40,
-        width: 20,
-        height: 20, 
-    },
-    button: {
+    profileSection: {
         alignItems: 'center',
-        borderColor:'white',
-        borderWidth: 2,
-        height: 50,
-        width: 300,
-        borderRadius: 8,
-        marginTop: 15,
-        justifyContent: 'center',
-        backgroundColor: 'white',
-        opacity: .45,
-    },
-    logoButton: {
-        alignItems: 'center',
-        height: 30,
-        width: 150,
-        marginBottom: 8,
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color:'#f00b0bff',
-        fontSize: 25,
-        fontWeight:'bold',
-        textAlign:'center',
-    },
-    share: {
-        position: 'absolute',
-        top: 35,
-        left: -120,
-        width: 55,
-        height: 55,
-    },
-    profile: {
-        position: 'absolute',
-        top: 40,
-        left: 210,
-        width: 50,
-        height: 50,
+        marginTop: 24,
+        marginBottom: 32,
     },
     profilepic: {
-        position: 'absolute',
-        top: 110,
-        left: 165,
         width: 100,
         height: 100,
+        borderRadius: 50,
+        marginBottom: 12,
     },
-    atSymbol: {
+    name: {
         fontSize: 20,
-        color: 'white',
         fontWeight: 'bold',
-        position: 'absolute',
-        top: 220,
-        left: 150,
+        color: 'white',
+        marginBottom: 4,
     },
-    star: {
-        position: 'absolute',
-        top: 300,
-        left: 60,
-        width: 50,
+    username: {
+        fontSize: 16,
+        color: 'white',
+        opacity: 0.85,
+    },
+    menu: {
+        flex: 1,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 8,
+    },
+    menuIcon: {
+        width: 24,
+        height: 24,
+        marginRight: 16,
+    },
+    menuLabel: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        color: 'white',
+    },
+    separator: {
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.4)',
+    },
+    logoutButton: {
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 8,
         height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+        backgroundColor: 'rgba(255,255,255,0.15)',
     },
-    search: {
-        position: 'absolute',
-        top: 265,
-        left: 185,
-        width: 45,
-        height: 45,
-    },
-    group: {
-        position: 'absolute',
-        top: 200,
-        left: 290,
-        width: 100,
-        height: 100,
+    logoutText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 
-export default UserProfile
+export default UserProfile;

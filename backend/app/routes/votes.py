@@ -109,8 +109,12 @@ def get_session_votes(session_id):
         ).count()
         votes_per_user[participant.user_id] = user_vote_count
 
-    # Check if all users have voted on all restaurants
-    all_finished = all(count == len(voted_restaurant_ids) for count in votes_per_user.values()) if voted_restaurant_ids else False
+    # Check if all users have finished voting (same non-zero vote count across all participants)
+    if votes_per_user:
+        counts = list(votes_per_user.values())
+        all_finished = counts[0] > 0 and all(c == counts[0] for c in counts)
+    else:
+        all_finished = False
 
     # Group votes by restaurant
     votes_by_restaurant = {}
@@ -245,6 +249,26 @@ def finalize_session(session_id):
     # Get restaurant details
     restaurant = db.session.get(Restaurant, winning_restaurant_id)
 
+    # Build top 3 restaurants with positive scores, ranked by score
+    positive_scores = sorted(
+        [(rid, score) for rid, score in scores.items() if score > 0],
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+
+    top_restaurants = []
+    for rid, score in positive_scores:
+        r = db.session.get(Restaurant, rid)
+        if r:
+            top_restaurants.append({
+                'restaurant_id': r.restaurant_id,
+                'name': r.name,
+                'formatted_address': r.formatted_address,
+                'cuisine': r.cuisine,
+                'phone_number': r.phone_number,
+                'score': score
+            })
+
     return jsonify({
         'message': 'session finalized',
         'winning_restaurant_id': session.matched_restaurant_id,
@@ -256,7 +280,8 @@ def finalize_session(session_id):
             'latitude': restaurant.latitude,
             'longitude': restaurant.longitude,
             'phone_number': restaurant.phone_number
-        } if restaurant else None
+        } if restaurant else None,
+        'top_restaurants': top_restaurants
     }), 200
 
 @votes_bp.route('/session/<int:session_id>/match', methods=['GET'])

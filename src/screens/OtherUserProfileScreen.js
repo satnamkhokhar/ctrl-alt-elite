@@ -141,6 +141,9 @@ function OtherUserProfileScreen() {
                                     {actionLoading ? '...' : getFriendButtonLabel()}
                                 </Text>
                             </TouchableOpacity>
+                            {friendStatus === 'friends' && (
+                                <Text style={styles.unfriendHint}>Tap to unfriend</Text>
+                            )}
 
                             {profile.favorite_restaurants && profile.favorite_restaurants.length > 0 && (
                                 <View style={styles.favoritesSection}>
@@ -227,6 +230,12 @@ const styles = StyleSheet.create({
     },
     friendButtonDisabled: {
         opacity: 0.6,
+    },
+    unfriendHint: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 12,
+        marginTop: 6,
+        marginBottom: 24,
     },
     friendButtonText: {
         color: 'white',

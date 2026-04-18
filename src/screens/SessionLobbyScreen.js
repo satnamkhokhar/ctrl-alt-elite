@@ -18,6 +18,7 @@ function SessionLobbyScreen() {
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState(null);
     const [isHost, setIsHost] = useState(false);
+    const [starting, setStarting] = useState(false);
     const navigatedRef = useRef(false); // prevents double-navigation for non-hosts
 
     const navigateToSwipe = async (dietary) => {
@@ -37,6 +38,7 @@ function SessionLobbyScreen() {
         navigation.navigate('SwipeCardScreen', {
             sessionId,
             userId: storedUserId,
+            isHost,
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
             radius: session?.max_distance * 1609.34 || 3000,
@@ -101,15 +103,19 @@ function SessionLobbyScreen() {
     };
 
     const handleStartSwiping = async () => {
+        if (starting) return;
+        setStarting(true);
         const result = await startSession(sessionId);
 
         if (!result.success) {
             Alert.alert('Error', result.error);
+            setStarting(false);
             return;
         }
 
         // dietary is aggregated from all members by the backend
         await navigateToSwipe(result.data.dietary);
+        setStarting(false);
     };
 
     const handleLeaveSession = () => {
@@ -186,8 +192,8 @@ function SessionLobbyScreen() {
                     </View>
 
                     {isHost ? (
-                        <TouchableOpacity style={styles.startButton} onPress={handleStartSwiping}>
-                            <Text style={styles.startButtonText}>Start Swiping</Text>
+                        <TouchableOpacity style={[styles.startButton, starting && styles.buttonDisabled]} onPress={handleStartSwiping} disabled={starting}>
+                            <Text style={styles.startButtonText}>{starting ? 'Starting...' : 'Start Swiping'}</Text>
                         </TouchableOpacity>
                     ) : (
                         <Text style={styles.waitingText}>Waiting for host to start...</Text>
@@ -300,6 +306,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: 'white',
         opacity: .45,
+    },
+    buttonDisabled: {
+        opacity: 0.6,
     },
     startButtonText: {
         fontSize: 25,
