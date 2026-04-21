@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..models.user import db, User
 from ..models.restaurant import Restaurant
+from ..models.vote import Vote
 import json
 
 users_bp = Blueprint('users', __name__)
@@ -57,6 +58,7 @@ def get_my_profile():
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
+        "dietary_restrictions": user.dietary_restrictions,
         "favorite_restaurants": favorites
     }), 200
 
@@ -107,13 +109,47 @@ def get_user_profile(user_id):
                 "address": r.location
             })
 
+    recent_votes = (
+        Vote.query
+        .filter_by(user_id=user_id, vote_value=1)
+        .order_by(Vote.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    seen = set()
+    recents = []
+    for v in recent_votes:
+        if v.restaurant_id not in seen:
+            seen.add(v.restaurant_id)
+            r = db.session.get(Restaurant, v.restaurant_id)
+            if r:
+                recents.append({
+                    "restaurant_id": r.restaurant_id,
+                    "name": r.name,
+                    "cuisine": r.cuisine,
+                })
+        if len(recents) == 6:
+            break
+
     return jsonify({
         "user_id": user.user_id,
         "username": user.username,
         "first_name": user.first_name,
         "last_name": user.last_name,
-        "favorite_restaurants": favorites
+        "favorite_restaurants": favorites,
+        "recent_restaurants": recents,
     }), 200
+
+# PUT dietary restrictions
+@users_bp.route('/me/dietary-restrictions', methods=['PUT'])
+@jwt_required()
+def update_dietary_restrictions():
+    user_id = int(get_jwt_identity())
+    user = User.query.get_or_404(user_id)
+    data = request.get_json()
+    user.dietary_restrictions = data.get('dietary_restrictions', '')
+    db.session.commit()
+    return jsonify({"message": "Dietary restrictions updated", "dietary_restrictions": user.dietary_restrictions}), 200
 
 # POST favorites
 @users_bp.route('/me/favorites', methods=['POST'])

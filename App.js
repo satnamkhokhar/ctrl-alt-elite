@@ -23,6 +23,7 @@ import UserProfile from './src/screens/UserProfile';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import RecentsScreen from './src/screens/RecentsScreen';
 import GroupScreen from './src/screens/GroupScreen';
+import EditDietaryRestrictionsScreen from './src/screens/EditDietaryRestrictionsScreen';
 
 //allows the app to switch screens
 const Stack = createNativeStackNavigator();
@@ -69,6 +70,7 @@ export default function App() {
             <Stack.Screen name='FavoritesScreen' component={FavoritesScreen} />
             <Stack.Screen name='RecentsScreen' component={RecentsScreen} />
             <Stack.Screen name='GroupScreen' component={GroupScreen} />
+            <Stack.Screen name='EditDietaryRestrictionsScreen' component={EditDietaryRestrictionsScreen} />
         </Stack.Navigator>
     </NavigationContainer>
       </UserProvider>

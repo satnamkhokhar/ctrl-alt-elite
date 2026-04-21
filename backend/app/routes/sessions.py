@@ -5,6 +5,7 @@ from ..models.session import Session, SessionUser
 from ..models.session_restaurant import SessionRestaurant
 from ..models.restaurant import Restaurant
 from ..models.user import db, User
+from ..models.saved_group import SavedGroupMember
 
 sessions_bp = Blueprint('sessions', __name__)
 
@@ -114,7 +115,7 @@ def join_session(session_id):
     ).first()
     
     if already_joined:
-        return jsonify({'error: User has already joined.'})
+        return jsonify({'message': 'already joined', 'session_id': session_id}), 200
     
     new_member = SessionUser(
         session_id=session_id,
@@ -190,32 +191,38 @@ def get_session_restaurants(session_id):
 @sessions_bp.route('/create-with-group', methods=['POST'])
 @jwt_required()
 def create_session_with_group():
-    user_id = int(get_jwt_identity())
     data = request.get_json()
 
-    group_id = data.get("group_id")
+    group_id = data.get('group_id')
+    budget = data.get('budget')
+    max_distance = data.get('max_distance')
 
-    if not group_id:
-        return jsonify({"error": "group_id required"}), 400
+    if not group_id or budget is None or max_distance is None:
+        return jsonify({'error': 'group_id, budget, and max_distance are required'}), 400
+
+    try:
+        budget = float(budget)
+        max_distance = float(max_distance)
+    except (ValueError, TypeError):
+        return jsonify({'error': 'budget and max_distance must be numbers'}), 400
 
     members = SavedGroupMember.query.filter_by(group_id=group_id).all()
-
     if not members:
-        return jsonify({"error": "Group has no members"}), 400
+        return jsonify({'error': 'Group has no members'}), 400
 
-    new_session = Session(created_by=user_id)
+    new_session = Session(budget=budget, max_distance=max_distance, active_users=len(members))
     db.session.add(new_session)
-    db.session.commit()
+    db.session.flush()
 
     for m in members:
-        db.session.add(SessionUser(
-            session_id=new_session.session_id,
-            user_id=m.user_id
-        ))
+        db.session.add(SessionUser(session_id=new_session.session_id, user_id=m.user_id))
 
     db.session.commit()
 
     return jsonify({
-        "message": "Session created from group",
-        "session_id": new_session.session_id
+        'message': 'Session created from group',
+        'session_id': new_session.session_id,
+        'budget': budget,
+        'max_distance': max_distance,
+        'active_users': len(members)
     }), 201

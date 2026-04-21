@@ -207,6 +207,32 @@ def finalize_session(session_id):
     # Check if already finalized
     if session.status == 'matched':
         restaurant = db.session.get(Restaurant, session.matched_restaurant_id)
+
+        votes = Vote.query.filter_by(session_id=session_id).all()
+        scores = {}
+        for vote in votes:
+            rid = vote.restaurant_id
+            scores[rid] = scores.get(rid, 0) + int(vote.vote_value)
+
+        positive_scores = sorted(
+            [(rid, score) for rid, score in scores.items() if score > 0],
+            key=lambda x: x[1],
+            reverse=True
+        )[:3]
+
+        top_restaurants = []
+        for rid, score in positive_scores:
+            r = db.session.get(Restaurant, rid)
+            if r:
+                top_restaurants.append({
+                    'restaurant_id': r.restaurant_id,
+                    'name': r.name,
+                    'formatted_address': r.formatted_address,
+                    'cuisine': r.cuisine,
+                    'phone_number': r.phone_number,
+                    'score': score
+                })
+
         return jsonify({
             'message': 'session already finalized',
             'winning_restaurant_id': session.matched_restaurant_id,
@@ -217,7 +243,8 @@ def finalize_session(session_id):
                 'cuisine': restaurant.cuisine,
                 'latitude': restaurant.latitude,
                 'longitude': restaurant.longitude
-            } if restaurant else None
+            } if restaurant else None,
+            'top_restaurants': top_restaurants
         }), 200
 
     # Get all votes

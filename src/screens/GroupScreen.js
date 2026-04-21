@@ -7,7 +7,7 @@ import {
     ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { createGroup, deleteGroup, getFriends, getGroups } from '../services/api';
+import { createGroup, createSessionWithGroup, deleteGroup, getFriends, getGroups } from '../services/api';
 
 function GroupScreen() {
     const navigation = useNavigation();
@@ -20,6 +20,12 @@ function GroupScreen() {
     const [friends, setFriends] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [creating, setCreating] = useState(false);
+
+    const [sessionModalVisible, setSessionModalVisible] = useState(false);
+    const [sessionGroup, setSessionGroup] = useState(null);
+    const [budget, setBudget] = useState('');
+    const [maxDistance, setMaxDistance] = useState('');
+    const [startingSession, setStartingSession] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -62,6 +68,29 @@ function GroupScreen() {
         if (result.success) {
             setModalVisible(false);
             await loadGroups();
+        } else {
+            Alert.alert('Error', result.error);
+        }
+    };
+
+    const openSessionModal = (group) => {
+        setSessionGroup(group);
+        setBudget('');
+        setMaxDistance('');
+        setSessionModalVisible(true);
+    };
+
+    const handleStartSession = async () => {
+        if (!budget || !maxDistance) {
+            Alert.alert('Required', 'Please enter budget and max distance.');
+            return;
+        }
+        setStartingSession(true);
+        const result = await createSessionWithGroup(sessionGroup.group_id, parseFloat(budget), parseFloat(maxDistance));
+        setStartingSession(false);
+        if (result.success) {
+            setSessionModalVisible(false);
+            navigation.navigate('SessionLobbyScreen', { sessionId: result.data.session_id });
         } else {
             Alert.alert('Error', result.error);
         }
@@ -133,6 +162,9 @@ function GroupScreen() {
                                     {item.members.map(m => (
                                         <Text key={m.user_id} style={styles.memberName}>• {m.name}</Text>
                                     ))}
+                                    <TouchableOpacity style={styles.startSessionButton} onPress={() => openSessionModal(item)}>
+                                        <Text style={styles.startSessionText}>Start Session</Text>
+                                    </TouchableOpacity>
                                 </View>
                             )}
                         />
@@ -204,6 +236,50 @@ function GroupScreen() {
                                 disabled={creating}
                             >
                                 <Text style={styles.createButtonText}>{creating ? 'Creating...' : 'Create'}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* Start Session Modal */}
+            <Modal visible={sessionModalVisible} transparent animationType="slide">
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalCard}>
+                        <Text style={styles.modalTitle}>Start Session</Text>
+                        {sessionGroup && (
+                            <Text style={styles.modalSubLabel}>with {sessionGroup.group_name}</Text>
+                        )}
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Budget ($)"
+                            placeholderTextColor="#aaa"
+                            value={budget}
+                            onChangeText={setBudget}
+                            keyboardType="numeric"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Max distance (miles)"
+                            placeholderTextColor="#aaa"
+                            value={maxDistance}
+                            onChangeText={setMaxDistance}
+                            keyboardType="numeric"
+                        />
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setSessionModalVisible(false)}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.createButton]}
+                                onPress={handleStartSession}
+                                disabled={startingSession}
+                            >
+                                <Text style={styles.createButtonText}>{startingSession ? 'Starting...' : 'Start'}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -317,6 +393,16 @@ const styles = StyleSheet.create({
     cancelButtonText: { color: '#555', fontWeight: 'bold' },
     createButton: { backgroundColor: '#f00b0bff' },
     createButtonText: { color: 'white', fontWeight: 'bold' },
+    startSessionButton: {
+        marginTop: 12,
+        backgroundColor: 'rgba(255,255,255,0.25)',
+        borderWidth: 1,
+        borderColor: 'white',
+        borderRadius: 8,
+        paddingVertical: 8,
+        alignItems: 'center',
+    },
+    startSessionText: { color: 'white', fontWeight: 'bold', fontSize: 14 },
 });
 
 export default GroupScreen;
