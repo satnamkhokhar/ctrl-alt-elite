@@ -51,7 +51,7 @@ function RecentsScreen() {
                 <SafeAreaView style={styles.inner}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Image source={require('../../assets/images/house.png')} style={styles.homeIcon} />
+                            <Image source={require('../../assets/images/return_button.png')} style={styles.homeIcon} />
                         </TouchableOpacity>
                         <Text style={styles.title}>Recents</Text>
                         {recents.length > 0 ? (

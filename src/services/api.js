@@ -232,6 +232,29 @@ export const startSession = async (sessionId) => {
     }
 };
 
+export const createSessionWithGroup = async (groupId, budget, maxDistance) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/sessions/create-with-group`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ group_id: groupId, budget, max_distance: maxDistance }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to create session' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
 export const createSession = async (budget, maxDistance) => {
     try {
         const token = await AsyncStorage.getItem('token');
@@ -577,6 +600,29 @@ export const getFriendshipStatus = async (userId) => {
             return { success: true, data };
         } else {
             return { success: false, error: data.error || 'failed to get friendship status' };
+        }
+    } catch (error) {
+        console.error('network error:', error);
+        return { success: false, error: 'could not connect to server' };
+    }
+};
+
+export const updateDietaryRestrictions = async (dietaryRestrictions) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}/users/me/dietary-restrictions`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ dietary_restrictions: dietaryRestrictions }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return { success: true, data };
+        } else {
+            return { success: false, error: data.error || 'failed to update dietary restrictions' };
         }
     } catch (error) {
         console.error('network error:', error);

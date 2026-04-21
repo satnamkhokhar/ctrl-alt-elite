@@ -57,7 +57,7 @@ function FavoritesScreen() {
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Image
-                                source={require('../../assets/images/house.png')}
+                                source={require('../../assets/images/return_button.png')}
                                 style={styles.homeIcon}
                             />
                         </TouchableOpacity>

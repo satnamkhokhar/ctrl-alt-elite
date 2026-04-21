@@ -1,11 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { getFriendshipStatus, sendFriendRequest, unfriend, acceptFriendRequest } from '../services/api';
-import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { acceptFriendRequest, getFriendshipStatus, sendFriendRequest, unfriend } from '../services/api';
 
 const BASE_URL = `http://${Constants.expoConfig.hostUri.split(':')[0]}:5001`;
 
@@ -98,9 +98,14 @@ function OtherUserProfileScreen() {
         return 'Add Friend';
     };
 
-    const isFriendButtonDisabled = () => {
-        return friendStatus === 'request_sent' || actionLoading;
-    };
+    const isFriendButtonDisabled = () => friendStatus === 'request_sent' || actionLoading;
+
+    const renderRestaurantCard = (item) => (
+        <View style={styles.card} key={String(item.restaurant_id)}>
+            <Image source={require('../../assets/images/cuisine.png')} style={styles.cardIcon} />
+            <Text style={styles.cardName} numberOfLines={2}>{item.name}</Text>
+        </View>
+    );
 
     return (
         <SafeAreaProvider>
@@ -111,54 +116,94 @@ function OtherUserProfileScreen() {
                 end={{ x: 1, y: 1 }}
             >
                 <SafeAreaView style={styles.inner}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Text style={styles.backText}>← Back</Text>
-                    </TouchableOpacity>
+
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image source={require('../../assets/images/return_button.png')} style={styles.headerIcon} />
+                        </TouchableOpacity>
+                        <Text style={styles.title}>DineSync</Text>
+                        <View style={styles.headerIcon} />
+                    </View>
 
                     {isLoading ? (
                         <ActivityIndicator size="large" color="white" style={styles.loader} />
                     ) : profile ? (
-                        <View style={styles.profileCard}>
-                            <View style={styles.avatar}>
-                                <Text style={styles.avatarText}>
-                                    {profile.first_name?.[0]}{profile.last_name?.[0]}
-                                </Text>
+                        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+
+                            {/* Profile */}
+                            <View style={styles.profileSection}>
+                                <View style={styles.avatar}>
+                                    <Text style={styles.avatarText}>
+                                        {profile.first_name?.[0]}{profile.last_name?.[0]}
+                                    </Text>
+                                </View>
+                                <Text style={styles.name}>{profile.first_name} {profile.last_name}</Text>
+                                <Text style={styles.username}>@{profile.username}</Text>
+
+                                {/* Friend button */}
+                                <TouchableOpacity
+                                    style={[
+                                        styles.friendButton,
+                                        friendStatus === 'friends' && styles.friendButtonActive,
+                                        isFriendButtonDisabled() && styles.friendButtonDisabled,
+                                    ]}
+                                    onPress={handleFriendAction}
+                                    disabled={isFriendButtonDisabled()}
+                                >
+                                    <Text style={[styles.friendButtonText, friendStatus === 'friends' && styles.friendButtonTextActive]}>
+                                        {actionLoading ? '...' : getFriendButtonLabel()}
+                                    </Text>
+                                </TouchableOpacity>
+                                {friendStatus === 'friends' && (
+                                    <Text style={styles.unfriendHint}>Tap to unfriend</Text>
+                                )}
                             </View>
 
-                            <Text style={styles.fullName}>{profile.first_name} {profile.last_name}</Text>
-                            <Text style={styles.username}>@{profile.username}</Text>
-
-                            <TouchableOpacity
-                                style={[
-                                    styles.friendButton,
-                                    friendStatus === 'friends' && styles.friendButtonActive,
-                                    isFriendButtonDisabled() && styles.friendButtonDisabled,
-                                ]}
-                                onPress={handleFriendAction}
-                                disabled={isFriendButtonDisabled()}
-                            >
-                                <Text style={styles.friendButtonText}>
-                                    {actionLoading ? '...' : getFriendButtonLabel()}
-                                </Text>
-                            </TouchableOpacity>
-                            {friendStatus === 'friends' && (
-                                <Text style={styles.unfriendHint}>Tap to unfriend</Text>
-                            )}
-
+                            {/* Favorites */}
                             {profile.favorite_restaurants && profile.favorite_restaurants.length > 0 && (
-                                <View style={styles.favoritesSection}>
-                                    <Text style={styles.sectionTitle}>Favorite Restaurants</Text>
-                                    {profile.favorite_restaurants.map((r) => (
-                                        <Text key={r.restaurant_id} style={styles.restaurantItem}>
-                                            • {r.name}
-                                        </Text>
-                                    ))}
+                                <View style={styles.section}>
+                                    <View style={styles.sectionHeader}>
+                                        <Image source={require('../../assets/images/heart.png')} style={styles.sectionIcon} />
+                                        <Text style={styles.sectionLabel}>favorites</Text>
+                                    </View>
+                                    <View style={styles.grid}>
+                                        {profile.favorite_restaurants.slice(0, 3).map(renderRestaurantCard)}
+                                    </View>
                                 </View>
                             )}
-                        </View>
+
+                            {/* Recents */}
+                            {profile.recent_restaurants && profile.recent_restaurants.length > 0 && (
+                                <View style={styles.section}>
+                                    <View style={styles.sectionHeader}>
+                                        <Image source={require('../../assets/images/clock.png')} style={styles.sectionIcon} />
+                                        <Text style={styles.sectionLabel}>recent</Text>
+                                    </View>
+                                    <View style={styles.grid}>
+                                        {profile.recent_restaurants.slice(0, 3).map(renderRestaurantCard)}
+                                    </View>
+                                </View>
+                            )}
+
+                        </ScrollView>
                     ) : (
                         <Text style={styles.errorText}>Could not load profile.</Text>
                     )}
+
+                    {/* Bottom nav */}
+                    <View style={styles.footer}>
+                        <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')}>
+                            <Image source={require('../../assets/images/star.png')} style={styles.footerIcon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                            <Image source={require('../../assets/images/house.png')} style={styles.footerIcon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('GroupScreen')}>
+                            <Image source={require('../../assets/images/group.png')} style={styles.footerIconLarge} />
+                        </TouchableOpacity>
+                    </View>
+
                 </SafeAreaView>
             </LinearGradient>
         </SafeAreaProvider>
@@ -166,28 +211,26 @@ function OtherUserProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    inner: {
-        flex: 1,
-        paddingHorizontal: 20,
-        paddingTop: 20,
-    },
-    backButton: {
-        marginBottom: 20,
-    },
-    backText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    loader: {
-        marginTop: 60,
-    },
-    profileCard: {
+    container: { flex: 1 },
+    inner: { flex: 1, paddingHorizontal: 20 },
+    header: {
+        flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: 20,
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        color: 'white',
+    },
+    headerIcon: { width: 36, height: 36 },
+    loader: { marginTop: 60 },
+    scrollContent: { paddingBottom: 16 },
+    profileSection: {
+        alignItems: 'center',
+        marginVertical: 20,
     },
     avatar: {
         width: 90,
@@ -196,7 +239,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.3)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 10,
         borderWidth: 2,
         borderColor: 'white',
     },
@@ -205,59 +248,70 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: 'bold',
     },
-    fullName: {
-        color: 'white',
-        fontSize: 26,
+    name: {
+        fontSize: 20,
         fontWeight: 'bold',
+        color: 'white',
         marginBottom: 4,
     },
     username: {
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 16,
-        marginBottom: 24,
+        fontSize: 15,
+        color: 'rgba(255,255,255,0.85)',
+        marginBottom: 16,
     },
     friendButton: {
         borderColor: 'white',
         borderWidth: 2,
         borderRadius: 8,
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 32,
         backgroundColor: 'rgba(255,255,255,0.2)',
-        marginBottom: 30,
     },
-    friendButtonActive: {
-        backgroundColor: 'white',
-    },
-    friendButtonDisabled: {
-        opacity: 0.6,
-    },
-    unfriendHint: {
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: 12,
-        marginTop: 6,
-        marginBottom: 24,
-    },
+    friendButtonActive: { backgroundColor: 'white' },
+    friendButtonDisabled: { opacity: 0.6 },
     friendButtonText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
     },
-    favoritesSection: {
-        alignSelf: 'stretch',
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        borderRadius: 8,
-        padding: 14,
+    friendButtonTextActive: { color: '#f00b0bff' },
+    unfriendHint: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 12,
+        marginTop: 6,
     },
-    sectionTitle: {
-        color: 'white',
-        fontWeight: 'bold',
+    section: { marginBottom: 20 },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    sectionIcon: { width: 20, height: 20, marginRight: 6 },
+    sectionLabel: {
         fontSize: 16,
-        marginBottom: 8,
+        fontWeight: 'bold',
+        color: 'white',
     },
-    restaurantItem: {
-        color: 'rgba(255,255,255,0.9)',
-        fontSize: 14,
-        marginBottom: 4,
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    card: {
+        width: '30.5%',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.4)',
+        padding: 8,
+        alignItems: 'center',
+    },
+    cardIcon: { width: 40, height: 40, marginBottom: 6 },
+    cardName: {
+        fontSize: 11,
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: '500',
     },
     errorText: {
         color: 'white',
@@ -265,6 +319,15 @@ const styles = StyleSheet.create({
         marginTop: 60,
         fontSize: 16,
     },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
+    footerIcon: { width: 50, height: 50 },
+    footerIconLarge: { width: 70, height: 70 },
 });
 
 export default OtherUserProfileScreen;
